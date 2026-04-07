@@ -1,0 +1,2231 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forma — Ship audit-grade software, faster.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       CSS CUSTOM PROPERTIES
+       Dark default · Light via [data-theme="light"]
+    ══════════════════════════════════════════════════════════ */
+    :root {
+      /* Backgrounds — layered dark surfaces */
+      --bg:          #0d0f12;
+      --bg-2:        #131619;
+      --bg-3:        #1a1d22;
+      --surface:     #1e2128;
+      --surface-2:   #252930;
+
+      /* Borders */
+      --border:      #2a2e37;
+      --border-2:    #353a45;
+
+      /* Typography */
+      --text:        #e6e8ec;
+      --text-muted:  #8b91a0;
+      --text-dim:    #535868;
+
+      /* Electric teal accent */
+      --accent:      #00c9b1;
+      --accent-dim:  rgba(0, 201, 177, 0.12);
+      --accent-glow: rgba(0, 201, 177, 0.25);
+
+      /* Utility */
+      --white:       #f7f8fa;
+      --red:         #ff5c5c;
+
+      /* Type stacks */
+      --font-display: 'Geist', system-ui, sans-serif;
+      --font-body:    'Figtree', system-ui, sans-serif;
+      --font-mono:    'Geist Mono', 'JetBrains Mono', monospace;
+
+      /* Geometry */
+      --radius:       8px;
+      --radius-lg:    14px;
+
+      /* Easing */
+      --transition:   200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+      /* Spacing scale — used consistently across all sections */
+      --section-y:    clamp(64px, 9vw, 112px);
+      --container-x:  clamp(20px, 5vw, 32px);
+    }
+
+    /* ── Light theme overrides ── */
+    [data-theme="light"] {
+      --bg:          #f7f8fa;
+      --bg-2:        #f0f1f5;
+      --bg-3:        #e8eaef;
+      --surface:     #ffffff;
+      --surface-2:   #f4f5f8;
+      --border:      #dde0e8;
+      --border-2:    #c8ccd6;
+      --text:        #0d0f12;
+      --text-muted:  #555d72;
+      --text-dim:    #9399a8;
+      --accent:      #00a896;
+      --accent-dim:  rgba(0, 168, 150, 0.10);
+      --accent-glow: rgba(0, 168, 150, 0.20);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RESET & BASE — mobile-first
+    ══════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      /* Respect user motion preferences */
+      scroll-behavior: smooth;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      /* Prevent font-size inflation on orientation change */
+      text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ACCESSIBILITY — focus-visible ring
+    ══════════════════════════════════════════════════════════ */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+    /* Suppress mouse-click outlines */
+    :focus:not(:focus-visible) { outline: none; }
+
+    /* ── Typography ── */
+    .font-display { font-family: var(--font-display); }
+    .font-mono    { font-family: var(--font-mono); }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    /* Fluid type — mobile base → desktop cap via clamp() */
+    .display-1 { font-size: clamp(2.4rem, 7vw,   5.2rem); font-weight: 800; }
+    .display-2 { font-size: clamp(1.75rem, 4.5vw, 3.4rem); font-weight: 800; }
+    .display-3 { font-size: clamp(1.25rem, 2.5vw, 2rem);   font-weight: 700; }
+
+    /* Monospace label — used as section eyebrow */
+    .label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    p { color: var(--text-muted); line-height: 1.7; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Layout utilities ── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--container-x);
+    }
+    /* Mobile-first section rhythm — scales with viewport */
+    .section { padding: var(--section-y) 0; }
+
+    /* ── Custom scrollbar — subtle, non-intrusive ── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-2);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    /* ══════════════════════════════════════════════════════════
+       NAV — fixed, glassmorphic, mobile-first
+    ══════════════════════════════════════════════════════════ */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      background: rgba(13, 15, 18, 0.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      transition: border-color var(--transition), background var(--transition);
+      /* Subtle top accent line */
+      box-shadow: 0 1px 0 var(--border);
+    }
+    [data-theme="light"] #nav {
+      background: rgba(247, 248, 250, 0.90);
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--container-x);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      /* Prevent logo from shrinking on narrow viewports */
+      flex-shrink: 0;
+    }
+    .nav-logo svg { width: 26px; height: 26px; }
+
+    /* Desktop nav links — hidden on mobile */
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      position: relative;
+      padding-bottom: 2px;
+    }
+    /* Underline hover — refined micro-interaction */
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width var(--transition);
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    /* Desktop "Get Started" CTA — hidden on mobile to keep nav uncluttered */
+    .nav-cta { display: none; }
+
+    /* ── Theme toggle button ── */
+    .theme-toggle {
+      width: 36px; height: 36px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      transition: color var(--transition), background var(--transition), border-color var(--transition);
+    }
+    .theme-toggle:hover {
+      color: var(--text);
+      background: var(--surface-2);
+      border-color: var(--border-2);
+    }
+    .icon-moon { display: block; }
+    .icon-sun  { display: none; }
+    [data-theme="light"] .icon-moon { display: none; }
+    [data-theme="light"] .icon-sun  { display: block; }
+
+    /* ── Hamburger ── visible on mobile, hidden on desktop */
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 36px; height: 36px;
+      align-items: center; justify-content: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      padding: 0;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .hamburger:hover {
+      background: var(--surface-2);
+      border-color: var(--border-2);
+    }
+    .hamburger span {
+      display: block;
+      width: 16px; height: 1.5px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity  280ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ── Mobile overlay ── */
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 60px 0 0 0;
+      background: var(--bg);
+      z-index: 850;
+      /* Comfortable tap targets with room to breathe */
+      padding: clamp(24px, 6vw, 40px) var(--container-x);
+      flex-direction: column;
+      gap: 4px;
+      /* Prevent overlay content from scrolling body */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .mobile-overlay.open { display: flex; }
+
+    .mobile-overlay a {
+      font-size: clamp(1.2rem, 5vw, 1.5rem);
+      font-weight: 700;
+      font-family: var(--font-display);
+      color: var(--text);
+      letter-spacing: -0.03em;
+      /* Minimum 48px tap target per WCAG 2.5.5 */
+      padding: 14px 0;
+      opacity: 0;
+      transform: translateY(16px);
+      border-bottom: 1px solid var(--border);
+      transition: color var(--transition);
+    }
+    .mobile-overlay a:hover { color: var(--accent); }
+    .mobile-overlay a.animated {
+      opacity: 1;
+      transform: none;
+      transition: opacity 320ms ease, transform 320ms ease, color var(--transition);
+    }
+    /* Mobile overlay CTA */
+    .mobile-overlay .mobile-cta {
+      margin-top: 20px;
+      background: var(--accent);
+      color: #0d0f12 !important;
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      text-align: center;
+      border-bottom: none;
+      font-weight: 700;
+      justify-content: center;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       BUTTONS — mobile-first sizing, active-state feedback
+    ══════════════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: -0.01em;
+      /* Minimum 44px height for touch compliance */
+      padding: 11px 20px;
+      min-height: 44px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition),
+                  border-color var(--transition), transform 150ms ease,
+                  box-shadow var(--transition), filter var(--transition);
+      border: 1px solid transparent;
+      white-space: nowrap;
+      position: relative;
+      /* Prevent text selection on double-tap */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    /* Active press feedback */
+    .btn:active { transform: scale(0.98) !important; }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #0d0f12;
+      border-color: var(--accent);
+    }
+    .btn-accent:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--surface);
+      border-color: var(--border-2);
+    }
+
+    /* Size variants */
+    .btn-lg {
+      padding: 14px 32px;
+      font-size: 1rem;
+      border-radius: var(--radius-lg);
+    }
+    .btn-xl {
+      padding: 16px 40px;
+      font-size: 1.1rem;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ── Desktop nav upgrades ── */
+    @media (min-width: 860px) {
+      .nav-links { display: flex; }
+      .nav-cta   { display: inline-flex; }
+      .hamburger { display: none; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       HERO — mobile-first, asymmetric split on desktop
+    ══════════════════════════════════════════════════════════ */
+    #hero {
+      min-height: 100svh; /* svh: real viewport on mobile browsers */
+      display: flex;
+      align-items: center;
+      padding-top: 60px; /* nav height offset */
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle noise grain overlay — adds tactile depth */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* Mobile: single column */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(48px, 8vw, 80px) var(--container-x);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Desktop: 58/42 asymmetric split */
+    @media (min-width: 860px) {
+      .hero-grid {
+        grid-template-columns: 58fr 42fr;
+        gap: 48px;
+        padding: 60px var(--container-x);
+      }
+    }
+
+    .hero-left { position: relative; z-index: 2; }
+
+    /* Eyebrow badge */
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(0, 201, 177, 0.25);
+      border-radius: 999px;
+      padding: 5px 14px;
+      margin-bottom: 24px;
+    }
+    .hero-eyebrow-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2.4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 var(--accent-glow); }
+      50%       { opacity: 0.6; transform: scale(0.75); box-shadow: 0 0 0 6px transparent; }
+    }
+    .hero-eyebrow span {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+
+    /* Hero headline — fluid from 2.6rem → 5.2rem */
+    .hero-h1 {
+      font-size: clamp(2.6rem, 6.5vw, 5.2rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.0;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .hero-h1 .accent { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: var(--text-muted);
+      /* Remove fixed max-width that clips on narrow screens */
+      max-width: 52ch;
+      margin-bottom: 32px;
+      line-height: 1.75;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    /* Full-width CTAs on very small screens */
+    @media (max-width: 420px) {
+      .hero-ctas { flex-direction: column; align-items: stretch; }
+      .hero-ctas .btn { width: 100%; }
+    }
+
+    /* Social proof pill */
+    .hero-social { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .avatar-stack { display: flex; }
+    .avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      margin-left: -7px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #0d0f12;
+      background: var(--accent);
+      /* Each avatar stacks above the previous */
+      transition: transform var(--transition), z-index 0s;
+    }
+    .avatar:first-child { margin-left: 0; }
+    .avatar:nth-child(2) { background: #7c6ff7; }
+    .avatar:nth-child(3) { background: #f59e0b; }
+    .avatar:nth-child(4) { background: #ec4899; }
+    .avatar:nth-child(5) { background: #22c55e; }
+    /* Lift on hover */
+    .avatar-stack:hover .avatar { transform: translateX(-2px); }
+    .avatar-stack:hover .avatar:hover { transform: translateY(-3px) scale(1.1); z-index: 10; }
+
+    .social-text { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+    .social-text strong { color: var(--text); }
+
+    /* ── Terminal panel (right column) ── */
+    /* Hidden on mobile, shown on desktop */
+    .hero-right {
+      position: relative;
+      z-index: 2;
+      display: none;
+    }
+    @media (min-width: 860px) {
+      .hero-right { display: block; }
+    }
+
+    .terminal {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 201, 177, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      position: relative;
+    }
+    .terminal-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 11px 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .t-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .t-dot:nth-child(1) { background: #ff5f57; }
+    .t-dot:nth-child(2) { background: #febc2e; }
+    .t-dot:nth-child(3) { background: #28c840; }
+    .t-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin: 0 auto;
+      letter-spacing: 0.04em;
+    }
+    .terminal-body {
+      padding: 20px 22px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.85;
+      min-height: 248px;
+      /* Ensure terminal doesn't overflow its panel */
+      overflow: hidden;
+    }
+    .t-line { display: flex; gap: 8px; align-items: baseline; }
+    .t-prompt { color: var(--accent); user-select: none; flex-shrink: 0; }
+    .t-cmd    { color: var(--text); word-break: break-all; }
+    .t-out    { color: var(--text-muted); padding-left: 18px; }
+    .t-out.success { color: #22c55e; }
+    .t-out.warn    { color: #f59e0b; }
+    .t-out.info    { color: var(--accent); }
+
+    /* Blinking block cursor */
+    .cursor {
+      display: inline-block;
+      width: 7px; height: 13px;
+      background: var(--accent);
+      border-radius: 1px;
+      animation: blink 1.1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       WHAT IT DOES — numbered list + sticky code panel
+    ══════════════════════════════════════════════════════════ */
+    #what {
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Mobile: stack; desktop: side-by-side */
+    .what-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    @media (min-width: 900px) {
+      .what-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 72px;
+      }
+    }
+
+    .what-list { list-style: none; }
+    .what-item {
+      display: flex;
+      gap: 18px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      /* Subtle hover region */
+      transition: background var(--transition);
+      border-radius: 4px;
+      margin: 0 -8px;
+      padding-left: 8px; padding-right: 8px;
+    }
+    .what-item:first-child { padding-top: 0; }
+    .what-item:last-child  { border-bottom: none; }
+
+    /* Ghosted display numerals */
+    .what-num {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 5vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      color: var(--border-2);
+      min-width: 56px;
+      user-select: none;
+      transition: color 300ms ease;
+      /* Prevent numeral from collapsing on very narrow screens */
+      flex-shrink: 0;
+    }
+    .what-item:hover .what-num { color: var(--accent); }
+
+    .what-content h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .what-content p { font-size: 0.875rem; }
+
+    /* Offset panel — sticky on desktop, normal flow on mobile */
+    .what-panel {
+      position: static;
+      transform: none;
+    }
+    @media (min-width: 900px) {
+      .what-panel {
+        position: sticky;
+        top: 88px;
+        transform: translateY(80px);
+      }
+    }
+
+    /* ── Code panel shared component ── */
+    .code-panel {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      /* Prevent layout blowout from long code lines */
+      min-width: 0;
+    }
+    .code-header {
+      background: var(--surface);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .code-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border-2);
+      flex-shrink: 0;
+    }
+    .code-file {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-left: 4px;
+      /* Truncate long filenames */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .code-body {
+      padding: 18px 22px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.8;
+      overflow-x: auto;
+      /* Custom scrollbar for code panels */
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-2) transparent;
+    }
+
+    /* ── CSS-only syntax tokens ── */
+    .kw  { color: #7c6ff7; }          /* keyword   — purple */
+    .fn  { color: var(--accent); }    /* function  — teal   */
+    .str { color: #f59e0b; }          /* string    — amber  */
+    .cmt { color: var(--text-dim); font-style: italic; } /* comment */
+    .num { color: #ff8787; }          /* number    — red    */
+    .ty  { color: #22c55e; }          /* type/bool — green  */
+
+    /* ══════════════════════════════════════════════════════════
+       WHO IT'S FOR — audience table
+    ══════════════════════════════════════════════════════════ */
+    #who { background: var(--bg); }
+
+    .who-header {
+      text-align: center;
+      margin-bottom: clamp(36px, 5vw, 56px);
+    }
+    .who-header p { max-width: 48ch; margin: 12px auto 0; }
+
+    /* Table wrapper — allows horizontal scroll on tiny screens */
+    .table-wrap {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .audience-table {
+      width: 100%;
+      min-width: 480px; /* Prevents column collapse below readable width */
+      border-collapse: collapse;
+    }
+    .audience-table thead th {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-align: left;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      white-space: nowrap;
+    }
+    .audience-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition);
+    }
+    .audience-table tbody tr:last-child { border-bottom: none; }
+    .audience-table tbody tr:hover { background: var(--surface); }
+    .audience-table td {
+      padding: 20px 24px;
+      vertical-align: top;
+    }
+    .td-who {
+      font-weight: 700;
+      font-size: 0.975rem;
+      color: var(--text);
+      font-family: var(--font-display);
+      white-space: nowrap;
+    }
+    .td-value {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+    .td-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(0, 201, 177, 0.2);
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       FEATURE PROOF — tabbed interface with GSAP swap
+    ══════════════════════════════════════════════════════════ */
+    #features {
+      background: var(--bg-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: clamp(36px, 5vw, 56px);
+    }
+    .features-header p { max-width: 52ch; margin: 12px auto 0; }
+
+    /* Tab strip — horizontally scrollable on mobile */
+    .tab-list {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 4px;
+      /* Scroll on overflow instead of wrapping */
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      /* Center on desktop, scroll left on mobile */
+      max-width: 100%;
+      margin: 0 0 40px;
+    }
+    .tab-list::-webkit-scrollbar { display: none; }
+
+    /* Center tab list on desktop only */
+    @media (min-width: 640px) {
+      .tab-list {
+        width: fit-content;
+        margin: 0 auto 48px;
+      }
+    }
+
+    .tab-btn {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      /* Tall enough for comfortable tap */
+      padding: 9px 16px;
+      min-height: 40px;
+      border-radius: calc(var(--radius-lg) - 4px);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: color var(--transition), background var(--transition), box-shadow var(--transition);
+      white-space: nowrap;
+      /* Prevent shrinking */
+      flex-shrink: 0;
+    }
+    .tab-btn[aria-selected="true"] {
+      background: var(--bg);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
+    [data-theme="light"] .tab-btn[aria-selected="true"] {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Tab panels */
+    .tab-panels { position: relative; }
+    .tab-panel {
+      display: none;
+      grid-template-columns: 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+    .tab-panel.active { display: grid; }
+
+    /* Two columns on desktop */
+    @media (min-width: 720px) {
+      .tab-panel {
+        grid-template-columns: 1fr 1fr;
+        gap: 52px;
+        align-items: center;
+      }
+    }
+
+    .tab-info h3 {
+      font-size: clamp(1.3rem, 3vw, 1.6rem);
+      font-weight: 800;
+      margin-bottom: 14px;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+    .tab-info p { margin-bottom: 22px; }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .feature-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .feature-check {
+      width: 17px; height: 17px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--accent);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PRICING — 3 tiers, honest feature lists
+    ══════════════════════════════════════════════════════════ */
+    #pricing { background: var(--bg); }
+
+    .pricing-header {
+      text-align: center;
+      margin-bottom: clamp(36px, 5vw, 56px);
+    }
+    .pricing-header p { max-width: 44ch; margin: 12px auto 0; }
+
+    /* Mobile: single column → tablet: 2-col → desktop: 3-col */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (min-width: 640px) {
+      .pricing-grid { grid-template-columns: 1fr 1fr; }
+      /* Recommended card spans both on tablet */
+      .pricing-card.recommended { grid-column: 1 / -1; max-width: 440px; margin: 0 auto; width: 100%; }
+    }
+    @media (min-width: 1024px) {
+      .pricing-grid { grid-template-columns: repeat(3, 1fr); }
+      .pricing-card.recommended { grid-column: auto; max-width: none; margin: 0; }
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: clamp(24px, 4vw, 32px) clamp(20px, 3.5vw, 28px);
+      position: relative;
+      transition: transform 250ms ease, box-shadow 250ms ease;
+    }
+    .pricing-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+    }
+    .pricing-card.recommended {
+      border-color: var(--accent);
+      background: var(--bg-2);
+    }
+    /* "Most popular" pill badge */
+    .pricing-card.recommended::before {
+      content: "Most popular";
+      position: absolute;
+      top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #0d0f12;
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .card-tier {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+    }
+    .card-price {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2.2rem, 4vw, 2.8rem);
+      letter-spacing: -0.05em;
+      color: var(--text);
+      /* Enforce tabular number alignment */
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+    .card-price sup {
+      font-size: 1.1rem;
+      font-weight: 600;
+      vertical-align: super;
+    }
+    .card-price sub {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .card-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 22px;
+      line-height: 1.6;
+    }
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 22px;
+    }
+    .card-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      margin-bottom: 24px;
+    }
+    .card-feat {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .feat-check {
+      flex-shrink: 0;
+      width: 15px; height: 15px;
+      margin-top: 2px;
+      color: var(--accent);
+    }
+    .feat-x { color: var(--text-dim); }
+
+    .no-contracts {
+      text-align: center;
+      margin-top: 28px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       CTA BLOCK — full-width dark panel
+    ══════════════════════════════════════════════════════════ */
+    #cta {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Subtle radial glow — adds energy without noise */
+    #cta::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .cta-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 0 var(--container-x);
+      position: relative;
+      z-index: 1;
+    }
+    .cta-h2 {
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 18px;
+    }
+    .cta-sub {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      margin-bottom: 36px;
+      max-width: 48ch;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 44px;
+    }
+    /* Stack CTA buttons on small screens */
+    @media (max-width: 480px) {
+      .cta-actions { flex-direction: column; align-items: stretch; }
+      .cta-actions .btn { width: 100%; }
+    }
+
+    .objections {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .objection {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+    /* Stack objections vertically on small screens */
+    @media (max-width: 520px) {
+      .objections { flex-direction: column; align-items: center; gap: 14px; }
+    }
+    .objection-icon { color: var(--accent); flex-shrink: 0; }
+
+    /* ══════════════════════════════════════════════════════════
+       MODAL — focus-trapped, ESC-closeable
+    ══════════════════════════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      /* Allow scrolling within modal on small screens */
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      /* Fluid padding — tighter on mobile */
+      padding: clamp(24px, 5vw, 40px);
+      position: relative;
+      animation: modalIn 240ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      /* Don't grow taller than viewport */
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.93) translateY(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1;
+      transition: color var(--transition), background var(--transition);
+    }
+    .modal-close:hover { color: var(--text); background: var(--surface-2); }
+
+    .modal h3 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      color: var(--text);
+      /* Room for close button */
+      padding-right: 40px;
+    }
+    .modal p {
+      font-size: 0.875rem;
+      margin-bottom: 22px;
+    }
+    .modal-form { display: flex; flex-direction: column; gap: 13px; }
+    .form-field { display: flex; flex-direction: column; gap: 5px; }
+    .form-field label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+    }
+    .form-field input,
+    .form-field textarea {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 11px 14px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      resize: vertical;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      /* Minimum tap height */
+      min-height: 44px;
+    }
+    .form-field textarea { min-height: 96px; }
+    .form-field input:focus,
+    .form-field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    .form-field input::placeholder,
+    .form-field textarea::placeholder { color: var(--text-dim); }
+
+    /* ══════════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════════ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--container-x);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      transition: color var(--transition);
+      /* Minimum tap target */
+      padding: 4px 0;
+    }
+    .footer-links a:hover { color: var(--text-muted); }
+
+    /* ══════════════════════════════════════════════════════════
+       SCROLL-TRIGGERED FADE HELPER
+    ══════════════════════════════════════════════════════════ */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════ NAV ══════════════════════════ -->
+<nav id="nav" role="navigation" aria-label="Primary navigation">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo" aria-label="Forma home">
+      <svg id="logo-svg" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect id="logo-r1" x="2" y="2" width="11" height="11" rx="3" stroke="#00c9b1" stroke-width="1.8" fill="none"/>
+        <rect id="logo-r2" x="15" y="2" width="11" height="11" rx="3" stroke="#00c9b1" stroke-width="1.8" fill="none"/>
+        <rect id="logo-r3" x="2" y="15" width="11" height="11" rx="3" stroke="#00c9b1" stroke-width="1.8" fill="none"/>
+        <rect id="logo-r4" x="15" y="15" width="11" height="11" rx="3" stroke="#00c9b1" stroke-width="1.8" fill="none"/>
+        <rect id="logo-fill" x="15" y="15" width="11" height="11" rx="3" fill="#00c9b1" opacity="0"/>
+      </svg>
+      Forma
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#what">What it does</a></li>
+      <li><a href="#who">Who it's for</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a href="#cta" class="btn btn-accent nav-cta">Get Started</a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile overlay -->
+<div class="mobile-overlay" id="mobileOverlay" aria-hidden="true">
+  <a href="#what" class="mobile-nav-link">What it does</a>
+  <a href="#who" class="mobile-nav-link">Who it's for</a>
+  <a href="#features" class="mobile-nav-link">Features</a>
+  <a href="#pricing" class="mobile-nav-link">Pricing</a>
+  <a href="#cta" class="mobile-nav-link mobile-cta">Get Started →</a>
+</div>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<section id="hero" aria-labelledby="hero-h1">
+  <div class="hero-grid">
+
+    <!-- Left -->
+    <div class="hero-left">
+      <div class="hero-eyebrow" id="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        <span>Now in public beta — v0.9.4</span>
+      </div>
+
+      <h1 class="hero-h1" id="hero-h1">
+        Ship software<br/>your clients<br/><span class="accent">can't dispute.</span>
+      </h1>
+
+      <p class="hero-sub">
+        Forma turns code review, compliance checks, and client reporting into a single repeatable workflow. Built for founders who bill on outcomes, not hours.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="#pricing" class="btn btn-accent btn-lg">Start free — no card needed</a>
+        <a href="#features" class="btn btn-ghost btn-lg">See how it works</a>
+      </div>
+
+      <div class="hero-social">
+        <div class="avatar-stack" aria-label="Users using Forma">
+          <div class="avatar">JK</div>
+          <div class="avatar">AR</div>
+          <div class="avatar">TM</div>
+          <div class="avatar">SL</div>
+          <div class="avatar">PD</div>
+        </div>
+        <p class="social-text"><strong>840+ founders</strong> shipped cleaner audits this month</p>
+      </div>
+    </div>
+
+    <!-- Right: Terminal -->
+    <div class="hero-right" id="hero-terminal">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="t-dot"></span>
+          <span class="t-dot"></span>
+          <span class="t-dot"></span>
+          <span class="t-title">forma — audit runner</span>
+        </div>
+        <div class="terminal-body" id="terminalBody">
+          <!-- JS fills this -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════ WHAT IT DOES ══════════════════════════ -->
+<section id="what" class="section" aria-labelledby="what-h2">
+  <div class="container">
+    <div class="what-grid">
+
+      <!-- Left: numbered list -->
+      <div>
+        <div class="label" style="margin-bottom:16px;">What it does</div>
+        <h2 class="display-2" id="what-h2" style="margin-bottom:48px;">Four things.<br/>Done right.</h2>
+        <ul class="what-list">
+          <li class="what-item fade-up">
+            <span class="what-num">01</span>
+            <div class="what-content">
+              <h3>Automated code audit</h3>
+              <p>Runs 200+ deterministic checks across your codebase in under 90 seconds. No fluff scoring, just exact line references your clients can verify.</p>
+            </div>
+          </li>
+          <li class="what-item fade-up">
+            <span class="what-num">02</span>
+            <div class="what-content">
+              <h3>Compliance diff tracking</h3>
+              <p>Git-native. Forma compares every commit against your chosen standard—SOC 2, OWASP, or custom rulesets—and surfaces only what changed.</p>
+            </div>
+          </li>
+          <li class="what-item fade-up">
+            <span class="what-num">03</span>
+            <div class="what-content">
+              <h3>Client-grade PDF reports</h3>
+              <p>One command generates a signed, timestamped PDF scoped to exactly what your contract covers. No redacting. No post-processing.</p>
+            </div>
+          </li>
+          <li class="what-item fade-up">
+            <span class="what-num">04</span>
+            <div class="what-content">
+              <h3>Webhook delivery pipeline</h3>
+              <p>Push results to Slack, Linear, Jira, or any endpoint. Every event is idempotent and replay-safe. Your integrations stay intact on reruns.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right: offset code panel -->
+      <div class="what-panel fade-up">
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-dot"></span>
+            <span class="code-dot"></span>
+            <span class="code-dot"></span>
+            <span class="code-file">forma.config.ts</span>
+          </div>
+          <div class="code-body">
+<pre><span class="kw">import</span> { <span class="ty">defineConfig</span> } <span class="kw">from</span> <span class="str">'forma'</span>
+
+<span class="kw">export default</span> <span class="fn">defineConfig</span>({
+  <span class="cmt">// run every push to main</span>
+  trigger: <span class="str">'push:main'</span>,
+
+  audit: {
+    standard: <span class="str">'owasp-top10'</span>,
+    custom:   <span class="str">'./rules/billing.ts'</span>,
+    failOn:   <span class="str">'critical'</span>,
+  },
+
+  report: {
+    format:    <span class="str">'pdf'</span>,
+    sign:      <span class="kw">true</span>,
+    recipient: <span class="str">'client@acme.com'</span>,
+  },
+
+  webhooks: [
+    {
+      url:    <span class="kw">process</span>.env.<span class="ty">SLACK_HOOK</span>,
+      events: [<span class="str">'audit.pass'</span>, <span class="str">'audit.fail'</span>],
+    },
+  ],
+})</pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ WHO IT'S FOR ══════════════════════════ -->
+<section id="who" class="section" aria-labelledby="who-h2">
+  <div class="container">
+    <div class="who-header">
+      <div class="label">Who it's for</div>
+      <h2 class="display-2" id="who-h2" style="margin-top:12px;">Built for the people<br/>billing on outcomes.</h2>
+      <p>Not a JIRA plugin. Not a compliance theater SaaS. Forma is for practitioners who own their client relationships end-to-end.</p>
+    </div>
+
+    <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
+      <table class="audience-table" role="table">
+        <thead>
+          <tr>
+            <th scope="col" style="width:35%">Audience</th>
+            <th scope="col">What Forma does for you</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="fade-up">
+            <td>
+              <div class="td-tag">Freelance devs</div>
+              <div class="td-who">Solo engineers & contractors</div>
+            </td>
+            <td class="td-value">Gives you audit artifacts your clients can hold—so disputes about scope become non-conversations. Close the engagement, move on.</td>
+          </tr>
+          <tr class="fade-up">
+            <td>
+              <div class="td-tag">Agencies</div>
+              <div class="td-who">Digital product studios</div>
+            </td>
+            <td class="td-value">Standardize quality across all client projects without doubling QA headcount. One config file, consistent output on every delivery.</td>
+          </tr>
+          <tr class="fade-up">
+            <td>
+              <div class="td-tag">Founders</div>
+              <div class="td-who">Technical startup founders</div>
+            </td>
+            <td class="td-value">Ship investor updates and due-diligence packages that include verifiable code quality signals—not just a Loom and a roadmap slide.</td>
+          </tr>
+          <tr class="fade-up">
+            <td>
+              <div class="td-tag">Auditors</div>
+              <div class="td-who">Security & compliance consultants</div>
+            </td>
+            <td class="td-value">Run reproducible assessments with full trace logs. Every finding links to a commit hash. No more "it depends on the environment" calls.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FEATURE PROOF ══════════════════════════ -->
+<section id="features" class="section" aria-labelledby="features-h2">
+  <div class="container">
+    <div class="features-header">
+      <div class="label">Feature proof</div>
+      <h2 class="display-2" id="features-h2" style="margin-top:12px;">Depth where it matters.</h2>
+      <p>Each feature ships with a test harness, an escape hatch, and documentation your clients can actually read.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div role="tablist" aria-label="Feature categories" class="tab-list">
+      <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="panel-audit"   id="tab-audit">Audit Engine</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-report"  id="tab-report">Reporting</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-ci"      id="tab-ci">CI/CD Integration</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-api"     id="tab-api">API & Webhooks</button>
+    </div>
+
+    <div class="tab-panels">
+
+      <!-- Panel 1: Audit -->
+      <div class="tab-panel active" id="panel-audit" role="tabpanel" aria-labelledby="tab-audit">
+        <div class="tab-info">
+          <h3>200+ deterministic checks</h3>
+          <p>Every check in Forma's audit engine is a pure function: same input, same output, every time. No machine-learning scoring, no confidence intervals—just pass, fail, or skip with a reason code.</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              OWASP Top 10, CWE/SANS 25, custom ruleset support
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Line-level findings with exact file path and commit hash
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Configurable severity thresholds — block CI or warn only
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Sub-90s runtime on repos up to 500k lines
+            </li>
+          </ul>
+        </div>
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+            <span class="code-file">audit output — terminal</span>
+          </div>
+          <div class="code-body">
+<pre><span class="cmt">$ forma audit --standard owasp-top10</span>
+
+<span class="ty">✓</span> Scanning <span class="num">312</span> files...
+<span class="ty">✓</span> Running <span class="num">214</span> checks in <span class="num">4</span> workers
+
+<span class="str">CRITICAL</span> <span class="num">0</span> findings
+<span class="fn">HIGH    </span> <span class="num">2</span> findings
+<span class="kw">MEDIUM  </span> <span class="num">7</span> findings
+
+<span class="str">→ HIGH</span> <span class="cmt">src/auth/session.ts:88</span>
+  <span class="ty">CWE-384</span> Session fixation — token not rotated on login
+
+<span class="str">→ HIGH</span> <span class="cmt">src/api/upload.ts:142</span>
+  <span class="ty">CWE-434</span> Unrestricted file upload — MIME not validated
+
+<span class="fn">Report saved:</span> ./forma-report-2025-01-14.pdf
+<span class="ty">Signed:      </span> SHA256:3fa2c...b91</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Reporting -->
+      <div class="tab-panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report">
+        <div class="tab-info">
+          <h3>Reports clients can actually read</h3>
+          <p>Forma generates scoped, signed PDFs formatted for non-technical stakeholders without removing the technical receipts your team needs. One report, both audiences.</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Digital signature with timestamp — court-admissible
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Custom branding — your logo, your color, your domain
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Executive summary auto-generated from finding severity
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              HTML, PDF, and JSON — one command, all three formats
+            </li>
+          </ul>
+        </div>
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+            <span class="code-file">report.config.ts</span>
+          </div>
+          <div class="code-body">
+<pre><span class="kw">export const</span> report = {
+  formats: [<span class="str">'pdf'</span>, <span class="str">'html'</span>, <span class="str">'json'</span>],
+
+  branding: {
+    logo:    <span class="str">'./assets/logo.svg'</span>,
+    primary: <span class="str">'#0d0f12'</span>,
+    accent:  <span class="str">'#00c9b1'</span>,
+  },
+
+  sections: {
+    executiveSummary: <span class="kw">true</span>,
+    findingsDetail:   <span class="kw">true</span>,
+    remediation:      <span class="kw">true</span>,
+    appendix:         <span class="str">'technical-trace'</span>,
+  },
+
+  sign: {
+    enabled: <span class="kw">true</span>,
+    keyPath: <span class="str">'./keys/forma.key'</span>,
+  },
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: CI/CD -->
+      <div class="tab-panel" id="panel-ci" role="tabpanel" aria-labelledby="tab-ci">
+        <div class="tab-info">
+          <h3>Drop into any pipeline in 4 lines</h3>
+          <p>Forma ships a GitHub Action, a GitLab CI template, and a bare CLI binary. No Docker-in-Docker, no privileged runners, no 45-minute setup guides.</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              GitHub Actions, GitLab CI, Bitbucket Pipelines
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              PR comments with inline finding annotations
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Zero-downtime config hot-reload across environments
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Secrets never leave your runner — no upload required
+            </li>
+          </ul>
+        </div>
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+            <span class="code-file">.github/workflows/forma.yml</span>
+          </div>
+          <div class="code-body">
+<pre><span class="kw">name:</span> Forma Audit
+<span class="kw">on:</span> [push, pull_request]
+
+<span class="kw">jobs:</span>
+  <span class="fn">audit:</span>
+    <span class="kw">runs-on:</span> ubuntu-latest
+    <span class="kw">steps:</span>
+      - <span class="kw">uses:</span> <span class="str">actions/checkout@v4</span>
+      - <span class="kw">uses:</span> <span class="str">forma-dev/action@v1</span>
+        <span class="kw">with:</span>
+          <span class="kw">token:</span> <span class="ty">${{ secrets.FORMA_TOKEN }}</span>
+          <span class="kw">standard:</span> <span class="str">owasp-top10</span>
+          <span class="kw">fail-on:</span> <span class="str">critical</span>
+          <span class="kw">report:</span> <span class="kw">true</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4: API -->
+      <div class="tab-panel" id="panel-api" role="tabpanel" aria-labelledby="tab-api">
+        <div class="tab-info">
+          <h3>REST API with webhook fanout</h3>
+          <p>Every audit is an API-first event. Trigger runs, pull results, stream findings in real time. All webhooks are idempotent, signed with HMAC-SHA256, and include replay headers.</p>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              OpenAPI 3.1 spec — import directly into Postman or Insomnia
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Rate-limit: 1000 req/min on Pro, unlimited on Enterprise
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              Webhook event log with 30-day retention and 1-click replay
+            </li>
+            <li class="feature-item">
+              <svg class="feature-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              TypeScript SDK — typed responses, zero runtime surprises
+            </li>
+          </ul>
+        </div>
+        <div class="code-panel">
+          <div class="code-header">
+            <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+            <span class="code-file">trigger-audit.ts</span>
+          </div>
+          <div class="code-body">
+<pre><span class="kw">import</span> { <span class="ty">Forma</span> } <span class="kw">from</span> <span class="str">'@forma/sdk'</span>
+
+<span class="kw">const</span> forma = <span class="kw">new</span> <span class="ty">Forma</span>({
+  token: <span class="kw">process</span>.env.<span class="ty">FORMA_TOKEN</span>,
+})
+
+<span class="kw">const</span> run = <span class="kw">await</span> forma.audits.<span class="fn">create</span>({
+  repo:     <span class="str">'acme/backend'</span>,
+  ref:      <span class="str">'main'</span>,
+  standard: <span class="str">'owasp-top10'</span>,
+})
+
+<span class="cmt">// Stream findings in real time</span>
+<span class="kw">for await</span> (<span class="kw">const</span> finding <span class="kw">of</span> run.<span class="fn">stream</span>()) {
+  console.<span class="fn">log</span>(finding.severity, finding.cwe)
+}</pre>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ PRICING ══════════════════════════ -->
+<section id="pricing" class="section" aria-labelledby="pricing-h2">
+  <div class="container">
+    <div class="pricing-header">
+      <div class="label">Pricing</div>
+      <h2 class="display-2" id="pricing-h2" style="margin-top:12px;">Honest pricing.<br/>Nothing hidden.</h2>
+      <p>Every tier includes the core audit engine. Upgrade when your client count, team size, or compliance requirements grow—not before.</p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Starter -->
+      <div class="pricing-card fade-up">
+        <div class="card-tier">Starter</div>
+        <div class="card-price"><sup>$</sup>0<sub>/mo</sub></div>
+        <div class="card-desc">For solo devs kicking the tires. No time limits, no watermarks.</div>
+        <div class="card-divider"></div>
+        <ul class="card-features">
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            3 audits per month
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            OWASP Top 10 standard
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            PDF + JSON output
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            GitHub Actions integration
+          </li>
+          <li class="card-feat" style="color:var(--text-dim)">
+            <svg class="feat-check feat-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Custom branding
+          </li>
+          <li class="card-feat" style="color:var(--text-dim)">
+            <svg class="feat-check feat-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Webhook delivery
+          </li>
+        </ul>
+        <a href="#cta" class="btn btn-ghost" style="width:100%;justify-content:center;">Get started free</a>
+      </div>
+
+      <!-- Pro (recommended) -->
+      <div class="pricing-card recommended fade-up">
+        <div class="card-tier">Pro</div>
+        <div class="card-price"><sup>$</sup>79<sub>/mo</sub></div>
+        <div class="card-desc">For agencies and consultants who bill clients on deliverables. Per-seat pricing kicks in after 3 seats.</div>
+        <div class="card-divider"></div>
+        <ul class="card-features">
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Unlimited audits
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            All standards + custom rulesets
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Signed PDF with custom branding
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Webhook delivery — 5 endpoints
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            REST API — 1,000 req/min
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Up to 3 team seats included
+          </li>
+        </ul>
+        <a href="#cta" class="btn btn-accent" style="width:100%;justify-content:center;">Start Pro — 14-day trial</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card fade-up">
+        <div class="card-tier">Enterprise</div>
+        <div class="card-price" style="font-size:2rem;">Custom</div>
+        <div class="card-desc">For security firms and product teams shipping regulated software. SOC 2 Type II available on request.</div>
+        <div class="card-divider"></div>
+        <ul class="card-features">
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Everything in Pro
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Self-hosted deployment option
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            SSO / SAML + audit log retention
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Unlimited webhook endpoints + API
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Dedicated support — SLA &lt; 4h
+          </li>
+          <li class="card-feat">
+            <svg class="feat-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Custom contract — annual or monthly
+          </li>
+        </ul>
+        <a href="#cta" class="btn btn-ghost" style="width:100%;justify-content:center;">Talk to us →</a>
+      </div>
+
+    </div>
+    <p class="no-contracts">No contracts. Cancel any time. Downgrade, not delete.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════ CTA BLOCK ══════════════════════════ -->
+<section id="cta" class="section" aria-labelledby="cta-h2">
+  <div class="cta-inner">
+    <div class="label" style="margin-bottom:16px;">Ready when you are</div>
+    <h2 class="cta-h2" id="cta-h2">Stop explaining.<br/><span style="color:var(--accent)">Start proving.</span></h2>
+    <p class="cta-sub">Your next client won't take your word for it. Give them a signed report they can actually read.</p>
+
+    <div class="cta-actions">
+      <a href="#pricing" class="btn btn-accent" style="font-size:1.15rem;padding:17px 48px;border-radius:12px;">Start free — no card needed</a>
+      <button class="btn btn-ghost" id="talkBtn" style="font-size:1.05rem;padding:17px 32px;border-radius:12px;">Talk to us first →</button>
+    </div>
+
+    <div class="objections">
+      <div class="objection">
+        <svg class="objection-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        Set up in under 5 minutes — CLI or GitHub Action.
+      </div>
+      <div class="objection">
+        <svg class="objection-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        Your code never touches our servers on self-hosted.
+      </div>
+      <div class="objection">
+        <svg class="objection-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        Cancel any time — data export included, no questions.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-copy">© 2025 Forma, Inc. — Built for founders.</div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Docs</a>
+      <a href="#">Status</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════ MODAL ══════════════════════════ -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose" aria-label="Close dialog">✕</button>
+    <p class="label" style="margin-bottom:8px;">Talk to us</p>
+    <h3 id="modal-title">We'll answer within one business day.</h3>
+    <p>Have questions about pricing, compliance requirements, or self-hosting? Send a note and a real engineer will respond—not a sales script.</p>
+    <form class="modal-form" id="modalForm" novalidate>
+      <div class="form-field">
+        <label for="modal-name">Your name</label>
+        <input type="text" id="modal-name" name="name" placeholder="Jane Smith" autocomplete="name" />
+      </div>
+      <div class="form-field">
+        <label for="modal-email">Work email</label>
+        <input type="email" id="modal-email" name="email" placeholder="jane@acme.com" autocomplete="email" />
+      </div>
+      <div class="form-field">
+        <label for="modal-msg">What are you trying to solve?</label>
+        <textarea id="modal-msg" name="message" rows="4" placeholder="Tell us about your use case, team size, or compliance requirements."></textarea>
+      </div>
+      <button type="submit" class="btn btn-accent" style="width:100%;justify-content:center;padding:13px;">Send it →</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  /* ─── Theme toggle ─── */
+  const html   = document.documentElement
+  const toggle = document.getElementById('themeToggle')
+
+  // Respect saved preference
+  const saved = localStorage.getItem('forma-theme')
+  if (saved) html.setAttribute('data-theme', saved)
+
+  toggle.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+    html.setAttribute('data-theme', next)
+    localStorage.setItem('forma-theme', next)
+  })
+
+  /* ─── Hamburger / mobile nav ─── */
+  const hamburger     = document.getElementById('hamburger')
+  const mobileOverlay = document.getElementById('mobileOverlay')
+  const mobileLinks   = document.querySelectorAll('.mobile-nav-link')
+
+  function openMenu() {
+    hamburger.classList.add('open')
+    hamburger.setAttribute('aria-expanded', 'true')
+    mobileOverlay.classList.add('open')
+    mobileOverlay.setAttribute('aria-hidden', 'false')
+    document.body.style.overflow = 'hidden'
+    mobileLinks.forEach((el, i) => {
+      el.classList.remove('animated')
+      setTimeout(() => el.classList.add('animated'), i * 70)
+    })
+  }
+  function closeMenu() {
+    hamburger.classList.remove('open')
+    hamburger.setAttribute('aria-expanded', 'false')
+    mobileOverlay.classList.remove('open')
+    mobileOverlay.setAttribute('aria-hidden', 'true')
+    document.body.style.overflow = ''
+  }
+
+  hamburger.addEventListener('click', () => mobileOverlay.classList.contains('open') ? closeMenu() : openMenu())
+  mobileLinks.forEach(l => l.addEventListener('click', closeMenu))
+
+  /* ─── Typewriter terminal ─── */
+  const sequences = [
+    [
+      { type: 'cmd',  text: 'forma audit --standard owasp-top10' },
+      { type: 'out',  text: '✓ Scanning 312 source files...', cls: 'info' },
+      { type: 'out',  text: '✓ Running 214 checks across 4 workers', cls: 'success' },
+      { type: 'out',  text: '→ 0 critical · 2 high · 7 medium findings', cls: 'warn' },
+      { type: 'out',  text: '✓ Report saved: forma-2025-01-14.pdf', cls: 'success' },
+    ],
+    [
+      { type: 'cmd',  text: 'forma report --format pdf --sign' },
+      { type: 'out',  text: '✓ Generating executive summary...', cls: 'info' },
+      { type: 'out',  text: '✓ Signing with SHA256:3fa2c...b91', cls: 'success' },
+      { type: 'out',  text: '✓ Emailed to client@acme.com', cls: 'success' },
+    ],
+    [
+      { type: 'cmd',  text: 'forma diff --from v1.2.0 --to v1.3.0' },
+      { type: 'out',  text: '✓ Comparing 48 changed files...', cls: 'info' },
+      { type: 'out',  text: '+ 3 new checks passing since last audit', cls: 'success' },
+      { type: 'out',  text: '→ 1 regression in src/auth/session.ts:88', cls: 'warn' },
+    ],
+  ]
+
+  const body = document.getElementById('terminalBody')
+  let seqIdx = 0
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+  async function typeChar(el, text) {
+    for (const ch of text) {
+      el.textContent += ch
+      await sleep(22 + Math.random() * 18)
+    }
+  }
+
+  async function runSequence() {
+    body.innerHTML = ''
+    const seq = sequences[seqIdx % sequences.length]
+    seqIdx++
+
+    for (let i = 0; i < seq.length; i++) {
+      const item = seq[i]
+      const line = document.createElement('div')
+      line.className = 't-line'
+
+      if (item.type === 'cmd') {
+        const prompt = document.createElement('span')
+        prompt.className = 't-prompt'
+        prompt.textContent = '❯'
+        const cmd = document.createElement('span')
+        cmd.className = 't-cmd'
+        line.appendChild(prompt)
+        line.appendChild(cmd)
+        body.appendChild(line)
+
+        // Add cursor
+        const cur = document.createElement('span')
+        cur.className = 'cursor'
+        cmd.after(cur)
+        await typeChar(cmd, item.text)
+        cur.remove()
+        await sleep(300)
+      } else {
+        const out = document.createElement('span')
+        out.className = `t-out${item.cls ? ' ' + item.cls : ''}`
+        out.textContent = ''
+        line.appendChild(out)
+        body.appendChild(line)
+        await typeChar(out, item.text)
+        await sleep(120)
+      }
+    }
+
+    // Final blinking cursor
+    const finalLine = document.createElement('div')
+    finalLine.className = 't-line'
+    const prompt2 = document.createElement('span')
+    prompt2.className = 't-prompt'
+    prompt2.textContent = '❯'
+    const blink = document.createElement('span')
+    blink.className = 'cursor'
+    finalLine.appendChild(prompt2)
+    finalLine.appendChild(blink)
+    body.appendChild(finalLine)
+
+    await sleep(3200)
+    await sleep(600)
+    runSequence()
+  }
+
+  /* ─── Tabs ─── */
+  const tabBtns   = document.querySelectorAll('.tab-btn')
+  const tabPanels = document.querySelectorAll('.tab-panel')
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('aria-controls')
+
+      tabBtns.forEach(b => {
+        b.setAttribute('aria-selected', 'false')
+      })
+      btn.setAttribute('aria-selected', 'true')
+
+      tabPanels.forEach(p => {
+        if (p.id === target) {
+          gsap.fromTo(p,
+            { opacity: 0, y: 18 },
+            { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out',
+              onStart: () => { p.classList.add('active') }
+            }
+          )
+        } else {
+          p.classList.remove('active')
+        }
+      })
+    })
+  })
+
+  /* ─── Modal ─── */
+  const backdrop = document.getElementById('modalBackdrop')
+  const modal    = document.getElementById('modal')
+  const talkBtn  = document.getElementById('talkBtn')
+  const closeBtn = document.getElementById('modalClose')
+  const form     = document.getElementById('modalForm')
+
+  const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+
+  function openModal() {
+    backdrop.classList.add('open')
+    backdrop.setAttribute('aria-hidden', 'false')
+    document.body.style.overflow = 'hidden'
+    // Focus first input
+    setTimeout(() => {
+      const first = modal.querySelectorAll(FOCUSABLE)[1]
+      if (first) first.focus()
+    }, 60)
+  }
+  function closeModal() {
+    backdrop.classList.remove('open')
+    backdrop.setAttribute('aria-hidden', 'true')
+    document.body.style.overflow = ''
+    talkBtn.focus()
+  }
+
+  talkBtn.addEventListener('click', openModal)
+  closeBtn.addEventListener('click', closeModal)
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal() })
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal()
+
+    // Focus trap
+    if (e.key === 'Tab' && backdrop.classList.contains('open')) {
+      const focusable = [...modal.querySelectorAll(FOCUSABLE)]
+      const first = focusable[0], last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus()
+      }
+    }
+  })
+
+  form.addEventListener('submit', e => {
+    e.preventDefault()
+    form.innerHTML = `<div style="text-align:center;padding:24px 0">
+      <div style="font-size:2rem;margin-bottom:12px">✓</div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:1.2rem;color:var(--text);margin-bottom:8px">Message received.</div>
+      <div style="color:var(--text-muted);font-size:0.9rem">We'll reply within one business day. No auto-responder, no CRM drip—a real response from someone who built Forma.</div>
+    </div>`
+    setTimeout(closeModal, 3000)
+  })
+
+  /* ─── Fade-up scroll observer ─── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        gsap.to(entry.target, {
+          opacity: 1, y: 0, duration: 0.55, ease: 'power2.out'
+        })
+        observer.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.12 })
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el))
+
+  /* ─── GSAP Hero entrance ─── */
+  window.addEventListener('DOMContentLoaded', () => {
+
+    // SVG logo stroke animation (strokeDasharray trick, no premium plugin needed)
+    const rects = document.querySelectorAll('#logo-r1, #logo-r2, #logo-r3, #logo-r4')
+    rects.forEach(r => {
+      const len = r.getTotalLength ? r.getTotalLength() : 48
+      r.style.strokeDasharray = len
+      r.style.strokeDashoffset = len
+    })
+    gsap.to(['#logo-r1','#logo-r2','#logo-r3','#logo-r4'], {
+      strokeDashoffset: 0,
+      duration: 0.7,
+      stagger: 0.12,
+      ease: 'power2.inOut',
+      delay: 0.1
+    })
+    gsap.to('#logo-fill', { opacity: 1, duration: 0.4, delay: 0.7 })
+
+    // Hero left sequences up
+    const heroEls = [
+      '#hero-eyebrow',
+      '.hero-h1',
+      '.hero-sub',
+      '.hero-ctas',
+      '.hero-social',
+    ]
+    gsap.set(heroEls, { opacity: 0, y: 36 })
+    gsap.to(heroEls, {
+      opacity: 1, y: 0,
+      duration: 0.65,
+      stagger: 0.11,
+      ease: 'power2.out',
+      delay: 0.25
+    })
+
+    // Terminal panel fades in
+    gsap.set('#hero-terminal', { opacity: 0, x: 30 })
+    gsap.to('#hero-terminal', {
+      opacity: 1, x: 0,
+      duration: 0.75,
+      ease: 'power2.out',
+      delay: 0.75
+    })
+
+    // Start typewriter after hero loads
+    setTimeout(runSequence, 900)
+  })
+</script>
+</body>
+</html>
