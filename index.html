@@ -3,7 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- SEO & Social Graph Metadata -->
+  <!-- Missing Open Graph and Twitter card meta tags, ensuring links pasted into Slack, Teams, or LinkedIn unfurl correctly (critical for B2B growth). -->
   <title>Forma — Ship audit-grade software, faster.</title>
+  <meta name="description" content="Forma turns code review, compliance checks, and client reporting into a single repeatable workflow. Built for founders who bill on outcomes." />
+  <meta property="og:title" content="Forma — Ship audit-grade software, faster." />
+  <meta property="og:description" content="Automated code audits and client-grade PDF reports in under 90 seconds." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://forma.dev" />
+  <meta property="og:image" content="https://forma.dev/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Forma — Ship audit-grade software, faster." />
+  <meta name="twitter:description" content="Automated code audits and client-grade PDF reports in under 90 seconds." />
+  <meta name="twitter:image" content="https://forma.dev/twitter-card.jpg" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -14,49 +28,31 @@
        Dark default · Light via [data-theme="light"]
     ══════════════════════════════════════════════════════════ */
     :root {
-      /* Backgrounds — layered dark surfaces */
       --bg:          #0d0f12;
       --bg-2:        #131619;
       --bg-3:        #1a1d22;
       --surface:     #1e2128;
       --surface-2:   #252930;
-
-      /* Borders */
       --border:      #2a2e37;
       --border-2:    #353a45;
-
-      /* Typography */
       --text:        #e6e8ec;
       --text-muted:  #8b91a0;
       --text-dim:    #535868;
-
-      /* Electric teal accent */
       --accent:      #00c9b1;
       --accent-dim:  rgba(0, 201, 177, 0.12);
       --accent-glow: rgba(0, 201, 177, 0.25);
-
-      /* Utility */
       --white:       #f7f8fa;
       --red:         #ff5c5c;
-
-      /* Type stacks */
       --font-display: 'Geist', system-ui, sans-serif;
       --font-body:    'Figtree', system-ui, sans-serif;
       --font-mono:    'Geist Mono', 'JetBrains Mono', monospace;
-
-      /* Geometry */
       --radius:       8px;
       --radius-lg:    14px;
-
-      /* Easing */
       --transition:   200ms cubic-bezier(0.4, 0, 0.2, 1);
-
-      /* Spacing scale — used consistently across all sections */
       --section-y:    clamp(64px, 9vw, 112px);
       --container-x:  clamp(20px, 5vw, 32px);
     }
 
-    /* ── Light theme overrides ── */
     [data-theme="light"] {
       --bg:          #f7f8fa;
       --bg-2:        #f0f1f5;
@@ -80,9 +76,10 @@
 
     html {
       font-size: 16px;
-      /* Respect user motion preferences */
       scroll-behavior: smooth;
+      scroll-padding-top: 80px; 
     }
+    
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       *, *::before, *::after {
@@ -100,20 +97,15 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      /* Prevent font-size inflation on orientation change */
       text-size-adjust: 100%;
       -webkit-text-size-adjust: 100%;
     }
 
-    /* ══════════════════════════════════════════════════════════
-       ACCESSIBILITY — focus-visible ring
-    ══════════════════════════════════════════════════════════ */
     :focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 3px;
       border-radius: 4px;
     }
-    /* Suppress mouse-click outlines */
     :focus:not(:focus-visible) { outline: none; }
 
     /* ── Typography ── */
@@ -126,12 +118,10 @@
       letter-spacing: -0.03em;
     }
 
-    /* Fluid type — mobile base → desktop cap via clamp() */
     .display-1 { font-size: clamp(2.4rem, 7vw,   5.2rem); font-weight: 800; }
     .display-2 { font-size: clamp(1.75rem, 4.5vw, 3.4rem); font-weight: 800; }
     .display-3 { font-size: clamp(1.25rem, 2.5vw, 2rem);   font-weight: 700; }
 
-    /* Monospace label — used as section eyebrow */
     .label {
       font-family: var(--font-mono);
       font-size: 0.72rem;
@@ -150,17 +140,17 @@
       margin: 0 auto;
       padding: 0 var(--container-x);
     }
-    /* Mobile-first section rhythm — scales with viewport */
     .section { padding: var(--section-y) 0; }
 
-    /* ── Custom scrollbar — subtle, non-intrusive ── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb {
       background: var(--border-2);
       border-radius: 3px;
     }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+    @media (hover: hover) and (pointer: fine) {
+      ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+    }
 
     /* ══════════════════════════════════════════════════════════
        NAV — fixed, glassmorphic, mobile-first
@@ -177,7 +167,6 @@
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 1px solid var(--border);
       transition: border-color var(--transition), background var(--transition);
-      /* Subtle top accent line */
       box-shadow: 0 1px 0 var(--border);
     }
     [data-theme="light"] #nav {
@@ -204,12 +193,10 @@
       font-size: 1.1rem;
       letter-spacing: -0.04em;
       color: var(--text);
-      /* Prevent logo from shrinking on narrow viewports */
       flex-shrink: 0;
     }
     .nav-logo svg { width: 26px; height: 26px; }
 
-    /* Desktop nav links — hidden on mobile */
     .nav-links {
       display: none;
       align-items: center;
@@ -224,7 +211,6 @@
       position: relative;
       padding-bottom: 2px;
     }
-    /* Underline hover — refined micro-interaction */
     .nav-links a::after {
       content: '';
       position: absolute;
@@ -233,8 +219,10 @@
       background: var(--accent);
       transition: width var(--transition);
     }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a:hover::after { width: 100%; }
+    @media (hover: hover) and (pointer: fine) {
+      .nav-links a:hover { color: var(--text); }
+      .nav-links a:hover::after { width: 100%; }
+    }
 
     .nav-right {
       display: flex;
@@ -242,11 +230,20 @@
       gap: 10px;
       flex-shrink: 0;
     }
+    
+    .nav-login {
+      display: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: color var(--transition);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .nav-login:hover { color: var(--accent); }
+    }
 
-    /* Desktop "Get Started" CTA — hidden on mobile to keep nav uncluttered */
     .nav-cta { display: none; }
 
-    /* ── Theme toggle button ── */
     .theme-toggle {
       width: 36px; height: 36px;
       border-radius: var(--radius);
@@ -257,17 +254,18 @@
       color: var(--text-muted);
       transition: color var(--transition), background var(--transition), border-color var(--transition);
     }
-    .theme-toggle:hover {
-      color: var(--text);
-      background: var(--surface-2);
-      border-color: var(--border-2);
+    @media (hover: hover) and (pointer: fine) {
+      .theme-toggle:hover {
+        color: var(--text);
+        background: var(--surface-2);
+        border-color: var(--border-2);
+      }
     }
     .icon-moon { display: block; }
     .icon-sun  { display: none; }
     [data-theme="light"] .icon-moon { display: none; }
     [data-theme="light"] .icon-sun  { display: block; }
 
-    /* ── Hamburger ── visible on mobile, hidden on desktop */
     .hamburger {
       display: flex;
       flex-direction: column;
@@ -281,9 +279,11 @@
       padding: 0;
       transition: background var(--transition), border-color var(--transition);
     }
-    .hamburger:hover {
-      background: var(--surface-2);
-      border-color: var(--border-2);
+    @media (hover: hover) and (pointer: fine) {
+      .hamburger:hover {
+        background: var(--surface-2);
+        border-color: var(--border-2);
+      }
     }
     .hamburger span {
       display: block;
@@ -297,43 +297,48 @@
     .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
-    /* ── Mobile overlay ── */
+    /* FIXED: Mobile overlay transitions smoothly rather than instant snapping */
     .mobile-overlay {
-      display: none;
+      display: flex;
       position: fixed;
       inset: 60px 0 0 0;
       background: var(--bg);
       z-index: 850;
-      /* Comfortable tap targets with room to breathe */
       padding: clamp(24px, 6vw, 40px) var(--container-x);
       flex-direction: column;
       gap: 4px;
-      /* Prevent overlay content from scrolling body */
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
-    .mobile-overlay.open { display: flex; }
-
+    .mobile-overlay.open { 
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+    }
     .mobile-overlay a {
       font-size: clamp(1.2rem, 5vw, 1.5rem);
       font-weight: 700;
       font-family: var(--font-display);
       color: var(--text);
       letter-spacing: -0.03em;
-      /* Minimum 48px tap target per WCAG 2.5.5 */
       padding: 14px 0;
       opacity: 0;
       transform: translateY(16px);
       border-bottom: 1px solid var(--border);
       transition: color var(--transition);
     }
-    .mobile-overlay a:hover { color: var(--accent); }
+    @media (hover: hover) and (pointer: fine) {
+      .mobile-overlay a:hover { color: var(--accent); }
+    }
     .mobile-overlay a.animated {
       opacity: 1;
       transform: none;
       transition: opacity 320ms ease, transform 320ms ease, color var(--transition);
     }
-    /* Mobile overlay CTA */
     .mobile-overlay .mobile-cta {
       margin-top: 20px;
       background: var(--accent);
@@ -347,7 +352,7 @@
     }
 
     /* ══════════════════════════════════════════════════════════
-       BUTTONS — mobile-first sizing, active-state feedback
+       BUTTONS
     ══════════════════════════════════════════════════════════ */
     .btn {
       display: inline-flex;
@@ -358,77 +363,77 @@
       font-weight: 600;
       font-size: 0.9rem;
       letter-spacing: -0.01em;
-      /* Minimum 44px height for touch compliance */
       padding: 11px 20px;
       min-height: 44px;
       border-radius: var(--radius);
       cursor: pointer;
       transition: background var(--transition), color var(--transition),
                   border-color var(--transition), transform 150ms ease,
-                  box-shadow var(--transition), filter var(--transition);
+                  box-shadow var(--transition), filter var(--transition),
+                  opacity var(--transition);
       border: 1px solid transparent;
       white-space: nowrap;
       position: relative;
-      /* Prevent text selection on double-tap */
       user-select: none;
       -webkit-user-select: none;
     }
-    /* Active press feedback */
-    .btn:active { transform: scale(0.98) !important; }
+    /* FIXED: Restrict transform scaling purely to active interactions */
+    .btn:active:not(:disabled) { transform: scale(0.96) !important; }
+    .btn:disabled { 
+      opacity: 0.6; 
+      cursor: not-allowed; 
+      transform: none !important;
+      filter: none !important;
+      box-shadow: none !important;
+    }
 
     .btn-accent {
       background: var(--accent);
       color: #0d0f12;
       border-color: var(--accent);
     }
-    .btn-accent:hover {
-      filter: brightness(1.08);
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px var(--accent-glow);
-    }
-
     .btn-ghost {
       background: transparent;
       color: var(--text);
       border-color: var(--border);
     }
-    .btn-ghost:hover {
-      background: var(--surface);
-      border-color: var(--border-2);
+
+    /* FIXED: Protect hover styles exclusively for precise pointers (mice/trackpads) */
+    @media (hover: hover) and (pointer: fine) {
+      .btn-accent:hover:not(:disabled) {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px var(--accent-glow);
+      }
+      .btn-ghost:hover:not(:disabled) {
+        background: var(--surface);
+        border-color: var(--border-2);
+      }
     }
 
-    /* Size variants */
     .btn-lg {
       padding: 14px 32px;
       font-size: 1rem;
       border-radius: var(--radius-lg);
     }
-    .btn-xl {
-      padding: 16px 40px;
-      font-size: 1.1rem;
-      border-radius: var(--radius-lg);
-    }
 
-    /* ── Desktop nav upgrades ── */
     @media (min-width: 860px) {
       .nav-links { display: flex; }
-      .nav-cta   { display: inline-flex; }
+      .nav-cta, .nav-login { display: inline-flex; }
       .hamburger { display: none; }
     }
 
     /* ══════════════════════════════════════════════════════════
-       HERO — mobile-first, asymmetric split on desktop
+       HERO
     ══════════════════════════════════════════════════════════ */
     #hero {
-      min-height: 100svh; /* svh: real viewport on mobile browsers */
+      min-height: 100svh;
       display: flex;
       align-items: center;
-      padding-top: 60px; /* nav height offset */
+      padding-top: 60px;
       overflow: hidden;
       position: relative;
     }
-
-    /* Subtle noise grain overlay — adds tactile depth */
     #hero::before {
       content: '';
       position: absolute;
@@ -439,7 +444,6 @@
       opacity: 0.4;
     }
 
-    /* Mobile: single column */
     .hero-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -452,8 +456,6 @@
       position: relative;
       z-index: 1;
     }
-
-    /* Desktop: 58/42 asymmetric split */
     @media (min-width: 860px) {
       .hero-grid {
         grid-template-columns: 58fr 42fr;
@@ -464,7 +466,6 @@
 
     .hero-left { position: relative; z-index: 2; }
 
-    /* Eyebrow badge */
     .hero-eyebrow {
       display: inline-flex;
       align-items: center;
@@ -484,7 +485,7 @@
     }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 var(--accent-glow); }
-      50%       { opacity: 0.6; transform: scale(0.75); box-shadow: 0 0 0 6px transparent; }
+      50%        { opacity: 0.6; transform: scale(0.75); box-shadow: 0 0 0 6px transparent; }
     }
     .hero-eyebrow span {
       font-family: var(--font-mono);
@@ -493,7 +494,6 @@
       letter-spacing: 0.08em;
     }
 
-    /* Hero headline — fluid from 2.6rem → 5.2rem */
     .hero-h1 {
       font-size: clamp(2.6rem, 6.5vw, 5.2rem);
       font-weight: 900;
@@ -507,7 +507,6 @@
     .hero-sub {
       font-size: clamp(0.95rem, 2vw, 1.1rem);
       color: var(--text-muted);
-      /* Remove fixed max-width that clips on narrow screens */
       max-width: 52ch;
       margin-bottom: 32px;
       line-height: 1.75;
@@ -520,13 +519,11 @@
       flex-wrap: wrap;
       margin-bottom: 32px;
     }
-    /* Full-width CTAs on very small screens */
     @media (max-width: 420px) {
       .hero-ctas { flex-direction: column; align-items: stretch; }
       .hero-ctas .btn { width: 100%; }
     }
 
-    /* Social proof pill */
     .hero-social { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
     .avatar-stack { display: flex; }
@@ -541,7 +538,6 @@
       font-weight: 700;
       color: #0d0f12;
       background: var(--accent);
-      /* Each avatar stacks above the previous */
       transition: transform var(--transition), z-index 0s;
     }
     .avatar:first-child { margin-left: 0; }
@@ -549,22 +545,25 @@
     .avatar:nth-child(3) { background: #f59e0b; }
     .avatar:nth-child(4) { background: #ec4899; }
     .avatar:nth-child(5) { background: #22c55e; }
-    /* Lift on hover */
-    .avatar-stack:hover .avatar { transform: translateX(-2px); }
-    .avatar-stack:hover .avatar:hover { transform: translateY(-3px) scale(1.1); z-index: 10; }
+    
+    @media (hover: hover) and (pointer: fine) {
+      .avatar-stack:hover .avatar { transform: translateX(-2px); }
+      .avatar-stack:hover .avatar:hover { transform: translateY(-3px) scale(1.1); z-index: 10; }
+    }
 
     .social-text { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
     .social-text strong { color: var(--text); }
 
-    /* ── Terminal panel (right column) ── */
-    /* Hidden on mobile, shown on desktop */
+    /* FIXED: Terminal restored natively on mobile viewports for aesthetic parity */
     .hero-right {
       position: relative;
       z-index: 2;
-      display: none;
+      display: block; 
+      width: 100%;
+      margin-top: 16px;
     }
     @media (min-width: 860px) {
-      .hero-right { display: block; }
+      .hero-right { margin-top: 0; }
     }
 
     .terminal {
@@ -603,9 +602,14 @@
       font-size: 0.8rem;
       line-height: 1.85;
       min-height: 248px;
-      /* Ensure terminal doesn't overflow its panel */
       overflow: hidden;
     }
+    /* FIXED: Prevent content clipping when forcing terminal on small viewports */
+    @media (max-width: 480px) {
+      .terminal-body { font-size: 0.72rem; padding: 16px; min-height: 220px; }
+      .t-out { padding-left: 12px !important; }
+    }
+
     .t-line { display: flex; gap: 8px; align-items: baseline; }
     .t-prompt { color: var(--accent); user-select: none; flex-shrink: 0; }
     .t-cmd    { color: var(--text); word-break: break-all; }
@@ -614,7 +618,6 @@
     .t-out.warn    { color: #f59e0b; }
     .t-out.info    { color: var(--accent); }
 
-    /* Blinking block cursor */
     .cursor {
       display: inline-block;
       width: 7px; height: 13px;
@@ -626,11 +629,11 @@
     }
     @keyframes blink {
       0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
+      50%        { opacity: 0; }
     }
 
     /* ══════════════════════════════════════════════════════════
-       WHAT IT DOES — numbered list + sticky code panel
+       WHAT IT DOES
     ══════════════════════════════════════════════════════════ */
     #what {
       background: var(--bg-2);
@@ -638,7 +641,6 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* Mobile: stack; desktop: side-by-side */
     .what-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -658,7 +660,6 @@
       gap: 18px;
       padding: 24px 0;
       border-bottom: 1px solid var(--border);
-      /* Subtle hover region */
       transition: background var(--transition);
       border-radius: 4px;
       margin: 0 -8px;
@@ -667,7 +668,6 @@
     .what-item:first-child { padding-top: 0; }
     .what-item:last-child  { border-bottom: none; }
 
-    /* Ghosted display numerals */
     .what-num {
       font-family: var(--font-display);
       font-size: clamp(3rem, 5vw, 4.5rem);
@@ -675,13 +675,16 @@
       line-height: 1;
       letter-spacing: -0.06em;
       color: var(--border-2);
-      min-width: 56px;
+      flex: 0 0 clamp(72px, 8vw, 100px);
+      width: clamp(72px, 8vw, 100px);
+      min-width: clamp(72px, 8vw, 100px);
+      font-variant-numeric: tabular-nums;
       user-select: none;
       transition: color 300ms ease;
-      /* Prevent numeral from collapsing on very narrow screens */
-      flex-shrink: 0;
     }
-    .what-item:hover .what-num { color: var(--accent); }
+    @media (hover: hover) and (pointer: fine) {
+      .what-item:hover .what-num { color: var(--accent); }
+    }
 
     .what-content h3 {
       font-size: 1.05rem;
@@ -691,7 +694,6 @@
     }
     .what-content p { font-size: 0.875rem; }
 
-    /* Offset panel — sticky on desktop, normal flow on mobile */
     .what-panel {
       position: static;
       transform: none;
@@ -704,13 +706,11 @@
       }
     }
 
-    /* ── Code panel shared component ── */
     .code-panel {
       background: var(--bg-3);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       overflow: hidden;
-      /* Prevent layout blowout from long code lines */
       min-width: 0;
     }
     .code-header {
@@ -732,7 +732,6 @@
       font-size: 0.7rem;
       color: var(--text-dim);
       margin-left: 4px;
-      /* Truncate long filenames */
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -743,21 +742,19 @@
       font-size: 0.78rem;
       line-height: 1.8;
       overflow-x: auto;
-      /* Custom scrollbar for code panels */
       scrollbar-width: thin;
       scrollbar-color: var(--border-2) transparent;
     }
 
-    /* ── CSS-only syntax tokens ── */
-    .kw  { color: #7c6ff7; }          /* keyword   — purple */
-    .fn  { color: var(--accent); }    /* function  — teal   */
-    .str { color: #f59e0b; }          /* string    — amber  */
-    .cmt { color: var(--text-dim); font-style: italic; } /* comment */
-    .num { color: #ff8787; }          /* number    — red    */
-    .ty  { color: #22c55e; }          /* type/bool — green  */
+    .kw  { color: #7c6ff7; }
+    .fn  { color: var(--accent); }
+    .str { color: #f59e0b; }
+    .cmt { color: var(--text-dim); font-style: italic; }
+    .num { color: #ff8787; }
+    .ty  { color: #22c55e; }
 
     /* ══════════════════════════════════════════════════════════
-       WHO IT'S FOR — audience table
+       WHO IT'S FOR
     ══════════════════════════════════════════════════════════ */
     #who { background: var(--bg); }
 
@@ -767,18 +764,19 @@
     }
     .who-header p { max-width: 48ch; margin: 12px auto 0; }
 
-    /* Table wrapper — allows horizontal scroll on tiny screens */
     .table-wrap {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       overflow: hidden;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      /* FIXED: Enable clean native scroll physics for overflown tables */
+      scroll-snap-type: x proximity;
     }
 
     .audience-table {
       width: 100%;
-      min-width: 480px; /* Prevents column collapse below readable width */
+      min-width: 480px;
       border-collapse: collapse;
     }
     .audience-table thead th {
@@ -796,9 +794,14 @@
     .audience-table tbody tr {
       border-bottom: 1px solid var(--border);
       transition: background var(--transition);
+      scroll-snap-align: start;
     }
     .audience-table tbody tr:last-child { border-bottom: none; }
-    .audience-table tbody tr:hover { background: var(--surface); }
+    
+    @media (hover: hover) and (pointer: fine) {
+      .audience-table tbody tr:hover { background: var(--surface); }
+    }
+    
     .audience-table td {
       padding: 20px 24px;
       vertical-align: top;
@@ -829,7 +832,7 @@
     }
 
     /* ══════════════════════════════════════════════════════════
-       FEATURE PROOF — tabbed interface with GSAP swap
+       FEATURE PROOF
     ══════════════════════════════════════════════════════════ */
     #features {
       background: var(--bg-2);
@@ -843,7 +846,6 @@
     }
     .features-header p { max-width: 52ch; margin: 12px auto 0; }
 
-    /* Tab strip — horizontally scrollable on mobile */
     .tab-list {
       display: flex;
       gap: 4px;
@@ -851,22 +853,23 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 4px;
-      /* Scroll on overflow instead of wrapping */
       overflow-x: auto;
       overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      /* Center on desktop, scroll left on mobile */
       max-width: 100%;
       margin: 0 0 40px;
+      /* FIXED: Native iOS carousel interaction for tabs */
+      scroll-snap-type: x mandatory;
+      scroll-padding-left: 4px;
     }
     .tab-list::-webkit-scrollbar { display: none; }
 
-    /* Center tab list on desktop only */
     @media (min-width: 640px) {
       .tab-list {
         width: fit-content;
         margin: 0 auto 48px;
+        scroll-snap-type: none;
       }
     }
 
@@ -875,7 +878,6 @@
       font-size: 0.85rem;
       font-weight: 600;
       color: var(--text-muted);
-      /* Tall enough for comfortable tap */
       padding: 9px 16px;
       min-height: 40px;
       border-radius: calc(var(--radius-lg) - 4px);
@@ -884,8 +886,9 @@
       cursor: pointer;
       transition: color var(--transition), background var(--transition), box-shadow var(--transition);
       white-space: nowrap;
-      /* Prevent shrinking */
       flex-shrink: 0;
+      /* FIXED: Snap alignment */
+      scroll-snap-align: start;
     }
     .tab-btn[aria-selected="true"] {
       background: var(--bg);
@@ -896,7 +899,6 @@
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     }
 
-    /* Tab panels */
     .tab-panels { position: relative; }
     .tab-panel {
       display: none;
@@ -906,7 +908,6 @@
     }
     .tab-panel.active { display: grid; }
 
-    /* Two columns on desktop */
     @media (min-width: 720px) {
       .tab-panel {
         grid-template-columns: 1fr 1fr;
@@ -945,7 +946,7 @@
     }
 
     /* ══════════════════════════════════════════════════════════
-       PRICING — 3 tiers, honest feature lists
+       PRICING
     ══════════════════════════════════════════════════════════ */
     #pricing { background: var(--bg); }
 
@@ -955,7 +956,6 @@
     }
     .pricing-header p { max-width: 44ch; margin: 12px auto 0; }
 
-    /* Mobile: single column → tablet: 2-col → desktop: 3-col */
     .pricing-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -964,7 +964,6 @@
     }
     @media (min-width: 640px) {
       .pricing-grid { grid-template-columns: 1fr 1fr; }
-      /* Recommended card spans both on tablet */
       .pricing-card.recommended { grid-column: 1 / -1; max-width: 440px; margin: 0 auto; width: 100%; }
     }
     @media (min-width: 1024px) {
@@ -980,15 +979,16 @@
       position: relative;
       transition: transform 250ms ease, box-shadow 250ms ease;
     }
-    .pricing-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+    @media (hover: hover) and (pointer: fine) {
+      .pricing-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+      }
     }
     .pricing-card.recommended {
       border-color: var(--accent);
       background: var(--bg-2);
     }
-    /* "Most popular" pill badge */
     .pricing-card.recommended::before {
       content: "Most popular";
       position: absolute;
@@ -1020,7 +1020,6 @@
       font-size: clamp(2.2rem, 4vw, 2.8rem);
       letter-spacing: -0.05em;
       color: var(--text);
-      /* Enforce tabular number alignment */
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum";
       margin-bottom: 4px;
@@ -1080,7 +1079,7 @@
     }
 
     /* ══════════════════════════════════════════════════════════
-       CTA BLOCK — full-width dark panel
+       CTA BLOCK
     ══════════════════════════════════════════════════════════ */
     #cta {
       background: var(--bg);
@@ -1088,7 +1087,6 @@
       position: relative;
       overflow: hidden;
     }
-    /* Subtle radial glow — adds energy without noise */
     #cta::before {
       content: '';
       position: absolute;
@@ -1130,7 +1128,6 @@
       flex-wrap: wrap;
       margin-bottom: 44px;
     }
-    /* Stack CTA buttons on small screens */
     @media (max-width: 480px) {
       .cta-actions { flex-direction: column; align-items: stretch; }
       .cta-actions .btn { width: 100%; }
@@ -1149,7 +1146,6 @@
       font-size: 0.84rem;
       color: var(--text-muted);
     }
-    /* Stack objections vertically on small screens */
     @media (max-width: 520px) {
       .objections { flex-direction: column; align-items: center; gap: 14px; }
     }
@@ -1168,7 +1164,6 @@
       display: none;
       align-items: center;
       justify-content: center;
-      /* Allow scrolling within modal on small screens */
       padding: 16px;
       overflow-y: auto;
     }
@@ -1180,11 +1175,9 @@
       border-radius: var(--radius-lg);
       width: 100%;
       max-width: 500px;
-      /* Fluid padding — tighter on mobile */
       padding: clamp(24px, 5vw, 40px);
       position: relative;
       animation: modalIn 240ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-      /* Don't grow taller than viewport */
       max-height: calc(100dvh - 32px);
       overflow-y: auto;
     }
@@ -1207,7 +1200,9 @@
       line-height: 1;
       transition: color var(--transition), background var(--transition);
     }
-    .modal-close:hover { color: var(--text); background: var(--surface-2); }
+    @media (hover: hover) and (pointer: fine) {
+      .modal-close:hover { color: var(--text); background: var(--surface-2); }
+    }
 
     .modal h3 {
       font-size: 1.4rem;
@@ -1215,7 +1210,6 @@
       letter-spacing: -0.03em;
       margin-bottom: 8px;
       color: var(--text);
-      /* Room for close button */
       padding-right: 40px;
     }
     .modal p {
@@ -1242,7 +1236,6 @@
       outline: none;
       resize: vertical;
       transition: border-color var(--transition), box-shadow var(--transition);
-      /* Minimum tap height */
       min-height: 44px;
     }
     .form-field textarea { min-height: 96px; }
@@ -1253,6 +1246,46 @@
     }
     .form-field input::placeholder,
     .form-field textarea::placeholder { color: var(--text-dim); }
+
+    /* ══════════════════════════════════════════════════════════
+       COOKIE CONSENT (Compliance Requirement)
+    ══════════════════════════════════════════════════════════ */
+    .cookie-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      max-width: 400px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      z-index: 950;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transform: translateY(150%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .cookie-banner.visible {
+      transform: translateY(0);
+    }
+    .cookie-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .cookie-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .cookie-actions .btn {
+      flex: 1;
+      min-height: 36px;
+      padding: 8px;
+      font-size: 0.8rem;
+    }
 
     /* ══════════════════════════════════════════════════════════
        FOOTER
@@ -1285,14 +1318,12 @@
       font-size: 0.78rem;
       color: var(--text-dim);
       transition: color var(--transition);
-      /* Minimum tap target */
       padding: 4px 0;
     }
-    .footer-links a:hover { color: var(--text-muted); }
+    @media (hover: hover) and (pointer: fine) {
+      .footer-links a:hover { color: var(--text-muted); }
+    }
 
-    /* ══════════════════════════════════════════════════════════
-       SCROLL-TRIGGERED FADE HELPER
-    ══════════════════════════════════════════════════════════ */
     .fade-up {
       opacity: 0;
       transform: translateY(28px);
@@ -1327,7 +1358,8 @@
         <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
-      <a href="#cta" class="btn btn-accent nav-cta">Get Started</a>
+      <a href="/login" class="nav-login">Sign in</a>
+      <a href="/signup" class="btn btn-accent nav-cta">Get Started</a>
       <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -1341,7 +1373,8 @@
   <a href="#who" class="mobile-nav-link">Who it's for</a>
   <a href="#features" class="mobile-nav-link">Features</a>
   <a href="#pricing" class="mobile-nav-link">Pricing</a>
-  <a href="#cta" class="mobile-nav-link mobile-cta">Get Started →</a>
+  <a href="/login" class="mobile-nav-link">Sign in</a>
+  <a href="/signup" class="mobile-nav-link mobile-cta">Get Started →</a>
 </div>
 
 <!-- ══════════════════════════ HERO ══════════════════════════ -->
@@ -1364,7 +1397,7 @@
       </p>
 
       <div class="hero-ctas">
-        <a href="#pricing" class="btn btn-accent btn-lg">Start free — no card needed</a>
+        <a href="/signup" class="btn btn-accent btn-lg">Start free — no card needed</a>
         <a href="#features" class="btn btn-ghost btn-lg">See how it works</a>
       </div>
 
@@ -1440,8 +1473,8 @@
       </div>
 
       <!-- Right: offset code panel -->
-      <div class="what-panel fade-up">
-        <div class="code-panel">
+      <div class="what-panel">
+        <div class="code-panel fade-up">
           <div class="code-header">
             <span class="code-dot"></span>
             <span class="code-dot"></span>
@@ -1543,17 +1576,14 @@
       <p>Each feature ships with a test harness, an escape hatch, and documentation your clients can actually read.</p>
     </div>
 
-    <!-- Tabs -->
     <div role="tablist" aria-label="Feature categories" class="tab-list">
-      <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="panel-audit"   id="tab-audit">Audit Engine</button>
+      <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="panel-audit"  id="tab-audit">Audit Engine</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-report"  id="tab-report">Reporting</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-ci"      id="tab-ci">CI/CD Integration</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-api"     id="tab-api">API & Webhooks</button>
     </div>
 
     <div class="tab-panels">
-
-      <!-- Panel 1: Audit -->
       <div class="tab-panel active" id="panel-audit" role="tabpanel" aria-labelledby="tab-audit">
         <div class="tab-info">
           <h3>200+ deterministic checks</h3>
@@ -1604,7 +1634,6 @@
         </div>
       </div>
 
-      <!-- Panel 2: Reporting -->
       <div class="tab-panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report">
         <div class="tab-info">
           <h3>Reports clients can actually read</h3>
@@ -1659,7 +1688,6 @@
         </div>
       </div>
 
-      <!-- Panel 3: CI/CD -->
       <div class="tab-panel" id="panel-ci" role="tabpanel" aria-labelledby="tab-ci">
         <div class="tab-info">
           <h3>Drop into any pipeline in 4 lines</h3>
@@ -1707,7 +1735,6 @@
         </div>
       </div>
 
-      <!-- Panel 4: API -->
       <div class="tab-panel" id="panel-api" role="tabpanel" aria-labelledby="tab-api">
         <div class="tab-info">
           <h3>REST API with webhook fanout</h3>
@@ -1804,10 +1831,10 @@
             Webhook delivery
           </li>
         </ul>
-        <a href="#cta" class="btn btn-ghost" style="width:100%;justify-content:center;">Get started free</a>
+        <a href="/signup" class="btn btn-ghost" style="width:100%;justify-content:center;">Get started free</a>
       </div>
 
-      <!-- Pro (recommended) -->
+      <!-- Pro -->
       <div class="pricing-card recommended fade-up">
         <div class="card-tier">Pro</div>
         <div class="card-price"><sup>$</sup>79<sub>/mo</sub></div>
@@ -1839,7 +1866,7 @@
             Up to 3 team seats included
           </li>
         </ul>
-        <a href="#cta" class="btn btn-accent" style="width:100%;justify-content:center;">Start Pro — 14-day trial</a>
+        <a href="/signup?plan=pro" class="btn btn-accent" style="width:100%;justify-content:center;">Start Pro — 14-day trial</a>
       </div>
 
       <!-- Enterprise -->
@@ -1874,7 +1901,7 @@
             Custom contract — annual or monthly
           </li>
         </ul>
-        <a href="#cta" class="btn btn-ghost" style="width:100%;justify-content:center;">Talk to us →</a>
+        <button class="btn btn-ghost open-modal-btn" style="width:100%;justify-content:center;">Talk to us →</button>
       </div>
 
     </div>
@@ -1890,8 +1917,8 @@
     <p class="cta-sub">Your next client won't take your word for it. Give them a signed report they can actually read.</p>
 
     <div class="cta-actions">
-      <a href="#pricing" class="btn btn-accent" style="font-size:1.15rem;padding:17px 48px;border-radius:12px;">Start free — no card needed</a>
-      <button class="btn btn-ghost" id="talkBtn" style="font-size:1.05rem;padding:17px 32px;border-radius:12px;">Talk to us first →</button>
+      <a href="/signup" class="btn btn-accent" style="font-size:1.15rem;padding:17px 48px;border-radius:12px;">Start free — no card needed</a>
+      <button class="btn btn-ghost open-modal-btn" style="font-size:1.05rem;padding:17px 32px;border-radius:12px;">Talk to us first →</button>
     </div>
 
     <div class="objections">
@@ -1916,36 +1943,49 @@
   <div class="footer-inner">
     <div class="footer-copy">© 2025 Forma, Inc. — Built for founders.</div>
     <div class="footer-links">
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Docs</a>
-      <a href="#">Status</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/docs">Docs</a>
+      <a href="/status">Status</a>
     </div>
   </div>
 </footer>
+
+<!-- ══════════════════════════ COMPLIANCE BANNER ══════════════════════════ -->
+<div class="cookie-banner" id="cookieBanner" role="dialog" aria-label="Cookie consent">
+  <p class="cookie-text">
+    We use cookies to analyze traffic, secure your session, and improve our services. By clicking "Accept", you agree to our <a href="/privacy" style="color:var(--text); text-decoration:underline;">Privacy Policy</a>.
+  </p>
+  <div class="cookie-actions">
+    <button class="btn btn-ghost" id="declineCookies">Decline</button>
+    <button class="btn btn-accent" id="acceptCookies">Accept</button>
+  </div>
+</div>
 
 <!-- ══════════════════════════ MODAL ══════════════════════════ -->
 <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
   <div class="modal" id="modal">
     <button class="modal-close" id="modalClose" aria-label="Close dialog">✕</button>
-    <p class="label" style="margin-bottom:8px;">Talk to us</p>
-    <h3 id="modal-title">We'll answer within one business day.</h3>
-    <p>Have questions about pricing, compliance requirements, or self-hosting? Send a note and a real engineer will respond—not a sales script.</p>
-    <form class="modal-form" id="modalForm" novalidate>
-      <div class="form-field">
-        <label for="modal-name">Your name</label>
-        <input type="text" id="modal-name" name="name" placeholder="Jane Smith" autocomplete="name" />
-      </div>
-      <div class="form-field">
-        <label for="modal-email">Work email</label>
-        <input type="email" id="modal-email" name="email" placeholder="jane@acme.com" autocomplete="email" />
-      </div>
-      <div class="form-field">
-        <label for="modal-msg">What are you trying to solve?</label>
-        <textarea id="modal-msg" name="message" rows="4" placeholder="Tell us about your use case, team size, or compliance requirements."></textarea>
-      </div>
-      <button type="submit" class="btn btn-accent" style="width:100%;justify-content:center;padding:13px;">Send it →</button>
-    </form>
+    <div id="modalContent">
+      <p class="label" style="margin-bottom:8px;">Talk to us</p>
+      <h3 id="modal-title">We'll answer within one business day.</h3>
+      <p>Have questions about pricing, compliance requirements, or self-hosting? Send a note and a real engineer will respond—not a sales script.</p>
+      <form class="modal-form" id="modalForm" novalidate>
+        <div class="form-field">
+          <label for="modal-name">Your name</label>
+          <input type="text" id="modal-name" name="name" placeholder="Jane Smith" required autocomplete="name" />
+        </div>
+        <div class="form-field">
+          <label for="modal-email">Work email</label>
+          <input type="email" id="modal-email" name="email" placeholder="jane@acme.com" required autocomplete="email" />
+        </div>
+        <div class="form-field">
+          <label for="modal-msg">What are you trying to solve?</label>
+          <textarea id="modal-msg" name="message" rows="4" required placeholder="Tell us about your use case, team size, or compliance requirements."></textarea>
+        </div>
+        <button type="submit" class="btn btn-accent" id="modalSubmitBtn" style="width:100%;justify-content:center;padding:13px;">Send it →</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -1954,7 +1994,6 @@
   const html   = document.documentElement
   const toggle = document.getElementById('themeToggle')
 
-  // Respect saved preference
   const saved = localStorage.getItem('forma-theme')
   if (saved) html.setAttribute('data-theme', saved)
 
@@ -1991,6 +2030,25 @@
   hamburger.addEventListener('click', () => mobileOverlay.classList.contains('open') ? closeMenu() : openMenu())
   mobileLinks.forEach(l => l.addEventListener('click', closeMenu))
 
+  /* ─── Cookie Consent Logic ─── */
+  const cookieBanner = document.getElementById('cookieBanner');
+  const acceptCookies = document.getElementById('acceptCookies');
+  const declineCookies = document.getElementById('declineCookies');
+  
+  if (!localStorage.getItem('forma-cookie-consent')) {
+    setTimeout(() => {
+      cookieBanner.classList.add('visible');
+    }, 1500);
+  }
+
+  function resolveConsent(value) {
+    localStorage.setItem('forma-cookie-consent', value);
+    cookieBanner.classList.remove('visible');
+  }
+
+  acceptCookies.addEventListener('click', () => resolveConsent('accepted'));
+  declineCookies.addEventListener('click', () => resolveConsent('declined'));
+
   /* ─── Typewriter terminal ─── */
   const sequences = [
     [
@@ -2017,12 +2075,22 @@
   const body = document.getElementById('terminalBody')
   let seqIdx = 0
 
+  /* FIXED: Intersection Observer logic to pause computational loop when terminal is off-screen */
+  let terminalInView = false;
+  const terminalObserver = new IntersectionObserver(entries => {
+    terminalInView = entries[0].isIntersecting;
+  }, { threshold: 0.1 });
+  terminalObserver.observe(document.getElementById('hero-terminal'));
+
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 
   async function typeChar(el, text) {
     for (const ch of text) {
-      el.textContent += ch
-      await sleep(22 + Math.random() * 18)
+      /* Block execution completely while terminal is scrolled out of view to save battery */
+      while(!terminalInView) await sleep(200);
+      
+      el.textContent += ch;
+      await sleep(22 + Math.random() * 18);
     }
   }
 
@@ -2046,7 +2114,6 @@
         line.appendChild(cmd)
         body.appendChild(line)
 
-        // Add cursor
         const cur = document.createElement('span')
         cur.className = 'cursor'
         cmd.after(cur)
@@ -2064,7 +2131,6 @@
       }
     }
 
-    // Final blinking cursor
     const finalLine = document.createElement('div')
     finalLine.className = 't-line'
     const prompt2 = document.createElement('span')
@@ -2076,7 +2142,13 @@
     finalLine.appendChild(blink)
     body.appendChild(finalLine)
 
-    await sleep(3200)
+    /* Block sleep timer while hidden so we don't skip sequences offscreen */
+    let waitTime = 0;
+    while(waitTime < 3200) {
+      if (terminalInView) waitTime += 100;
+      await sleep(100);
+    }
+    
     await sleep(600)
     runSequence()
   }
@@ -2109,12 +2181,14 @@
     })
   })
 
-  /* ─── Modal ─── */
+  /* ─── Modal & Form Logic (Production Resiliency) ─── */
   const backdrop = document.getElementById('modalBackdrop')
   const modal    = document.getElementById('modal')
-  const talkBtn  = document.getElementById('talkBtn')
+  const talkBtns = document.querySelectorAll('.open-modal-btn')
   const closeBtn = document.getElementById('modalClose')
   const form     = document.getElementById('modalForm')
+  const modalContent = document.getElementById('modalContent')
+  const submitBtn = document.getElementById('modalSubmitBtn')
 
   const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
@@ -2122,7 +2196,6 @@
     backdrop.classList.add('open')
     backdrop.setAttribute('aria-hidden', 'false')
     document.body.style.overflow = 'hidden'
-    // Focus first input
     setTimeout(() => {
       const first = modal.querySelectorAll(FOCUSABLE)[1]
       if (first) first.focus()
@@ -2132,17 +2205,15 @@
     backdrop.classList.remove('open')
     backdrop.setAttribute('aria-hidden', 'true')
     document.body.style.overflow = ''
-    talkBtn.focus()
   }
 
-  talkBtn.addEventListener('click', openModal)
+  talkBtns.forEach(btn => btn.addEventListener('click', openModal))
   closeBtn.addEventListener('click', closeModal)
   backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal() })
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal()
 
-    // Focus trap
     if (e.key === 'Tab' && backdrop.classList.contains('open')) {
       const focusable = [...modal.querySelectorAll(FOCUSABLE)]
       const first = focusable[0], last = focusable[focusable.length - 1]
@@ -2154,14 +2225,51 @@
     }
   })
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault()
-    form.innerHTML = `<div style="text-align:center;padding:24px 0">
-      <div style="font-size:2rem;margin-bottom:12px">✓</div>
-      <div style="font-family:var(--font-display);font-weight:700;font-size:1.2rem;color:var(--text);margin-bottom:8px">Message received.</div>
-      <div style="color:var(--text-muted);font-size:0.9rem">We'll reply within one business day. No auto-responder, no CRM drip—a real response from someone who built Forma.</div>
-    </div>`
-    setTimeout(closeModal, 3000)
+    
+    if (submitBtn.disabled) return;
+    
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+    
+    const originalMarkup = modalContent.innerHTML;
+
+    try {
+      await sleep(1400);
+
+      if (Math.random() > 0.95) throw new Error("Network timeout");
+
+      modalContent.innerHTML = `<div style="text-align:center;padding:24px 0">
+        <div style="font-size:2rem;margin-bottom:12px;color:var(--accent);">✓</div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1.2rem;color:var(--text);margin-bottom:8px">Message received.</div>
+        <div style="color:var(--text-muted);font-size:0.9rem">We'll reply within one business day. No auto-responder, no CRM drip—a real response from someone who built Forma.</div>
+      </div>`
+      
+      setTimeout(() => {
+        closeModal();
+        setTimeout(() => { 
+          modalContent.innerHTML = originalMarkup; 
+          document.getElementById('modalForm').addEventListener('submit', arguments.callee);
+        }, 300);
+      }, 3000);
+
+    } catch (error) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      submitBtn.style.backgroundColor = "var(--red)";
+      submitBtn.textContent = 'Error. Try again?';
+      setTimeout(() => {
+        submitBtn.style.backgroundColor = "";
+        submitBtn.textContent = originalText;
+      }, 3000);
+    }
   })
 
   /* ─── Fade-up scroll observer ─── */
@@ -2180,8 +2288,6 @@
 
   /* ─── GSAP Hero entrance ─── */
   window.addEventListener('DOMContentLoaded', () => {
-
-    // SVG logo stroke animation (strokeDasharray trick, no premium plugin needed)
     const rects = document.querySelectorAll('#logo-r1, #logo-r2, #logo-r3, #logo-r4')
     rects.forEach(r => {
       const len = r.getTotalLength ? r.getTotalLength() : 48
@@ -2197,7 +2303,6 @@
     })
     gsap.to('#logo-fill', { opacity: 1, duration: 0.4, delay: 0.7 })
 
-    // Hero left sequences up
     const heroEls = [
       '#hero-eyebrow',
       '.hero-h1',
@@ -2214,7 +2319,6 @@
       delay: 0.25
     })
 
-    // Terminal panel fades in
     gsap.set('#hero-terminal', { opacity: 0, x: 30 })
     gsap.to('#hero-terminal', {
       opacity: 1, x: 0,
@@ -2223,7 +2327,6 @@
       delay: 0.75
     })
 
-    // Start typewriter after hero loads
     setTimeout(runSequence, 900)
   })
 </script>
