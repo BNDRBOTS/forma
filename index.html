@@ -142,7 +142,7 @@
     }
     .section { padding: var(--section-y) 0; }
 
-    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb {
       background: var(--border-2);
@@ -612,7 +612,7 @@
 
     .t-line { display: flex; gap: 8px; align-items: baseline; }
     .t-prompt { color: var(--accent); user-select: none; flex-shrink: 0; }
-    .t-cmd    { color: var(--text); word-break: break-all; }
+    .t-cmd    { color: var(--text); word-break: break-word; }
     .t-out    { color: var(--text-muted); padding-left: 18px; }
     .t-out.success { color: #22c55e; }
     .t-out.warn    { color: #f59e0b; }
@@ -732,9 +732,7 @@
       font-size: 0.7rem;
       color: var(--text-dim);
       margin-left: 4px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      word-break: break-word;
     }
     .code-body {
       padding: 18px 22px;
@@ -744,6 +742,11 @@
       overflow-x: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--border-2) transparent;
+    }
+    .code-body pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
     .kw  { color: #7c6ff7; }
@@ -789,7 +792,6 @@
       padding: 12px 24px;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
-      white-space: nowrap;
     }
     .audience-table tbody tr {
       border-bottom: 1px solid var(--border);
@@ -811,7 +813,6 @@
       font-size: 0.975rem;
       color: var(--text);
       font-family: var(--font-display);
-      white-space: nowrap;
     }
     .td-value {
       font-size: 0.875rem;
