@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- SEO & Social Graph Metadata -->
-  <!-- Missing Open Graph and Twitter card meta tags, ensuring links pasted into Slack, Teams, or LinkedIn unfurl correctly (critical for B2B growth). -->
   <title>Forma — Ship audit-grade software, faster.</title>
   <meta name="description" content="Forma turns code review, compliance checks, and client reporting into a single repeatable workflow. Built for founders who bill on outcomes." />
   <meta property="og:title" content="Forma — Ship audit-grade software, faster." />
@@ -297,7 +296,6 @@
     .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
-    /* FIXED: Mobile overlay transitions smoothly rather than instant snapping */
     .mobile-overlay {
       display: flex;
       position: fixed;
@@ -377,7 +375,6 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    /* FIXED: Restrict transform scaling purely to active interactions */
     .btn:active:not(:disabled) { transform: scale(0.96) !important; }
     .btn:disabled { 
       opacity: 0.6; 
@@ -398,7 +395,6 @@
       border-color: var(--border);
     }
 
-    /* FIXED: Protect hover styles exclusively for precise pointers (mice/trackpads) */
     @media (hover: hover) and (pointer: fine) {
       .btn-accent:hover:not(:disabled) {
         filter: brightness(1.08);
@@ -554,7 +550,6 @@
     .social-text { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
     .social-text strong { color: var(--text); }
 
-    /* FIXED: Terminal restored natively on mobile viewports for aesthetic parity */
     .hero-right {
       position: relative;
       z-index: 2;
@@ -604,7 +599,6 @@
       min-height: 248px;
       overflow: hidden;
     }
-    /* FIXED: Prevent content clipping when forcing terminal on small viewports */
     @media (max-width: 480px) {
       .terminal-body { font-size: 0.72rem; padding: 16px; min-height: 220px; }
       .t-out { padding-left: 12px !important; }
@@ -741,7 +735,7 @@
       line-height: 1.8;
       overflow-x: auto;
       scrollbar-width: thin;
-      scrollbar-color: var(--border-2) transparent;
+      scrollbar-color: var(--border-2 transparent);
     }
     .code-body pre {
       margin: 0;
@@ -773,7 +767,6 @@
       overflow: hidden;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      /* FIXED: Enable clean native scroll physics for overflown tables */
       scroll-snap-type: x proximity;
     }
 
@@ -860,7 +853,6 @@
       scrollbar-width: none;
       max-width: 100%;
       margin: 0 0 40px;
-      /* FIXED: Native iOS carousel interaction for tabs */
       scroll-snap-type: x mandatory;
       scroll-padding-left: 4px;
     }
@@ -888,7 +880,6 @@
       transition: color var(--transition), background var(--transition), box-shadow var(--transition);
       white-space: nowrap;
       flex-shrink: 0;
-      /* FIXED: Snap alignment */
       scroll-snap-align: start;
     }
     .tab-btn[aria-selected="true"] {
@@ -2076,7 +2067,7 @@
   const body = document.getElementById('terminalBody')
   let seqIdx = 0
 
-  /* FIXED: Intersection Observer logic to pause computational loop when terminal is off-screen */
+  /* Intersection Observer logic to pause computational loop when terminal is off-screen */
   let terminalInView = false;
   const terminalObserver = new IntersectionObserver(entries => {
     terminalInView = entries[0].isIntersecting;
@@ -2087,7 +2078,7 @@
 
   async function typeChar(el, text) {
     for (const ch of text) {
-      /* Block execution completely while terminal is scrolled out of view to save battery */
+      /* Block execution completely while terminal is scrolled out of view */
       while(!terminalInView) await sleep(200);
       
       el.textContent += ch;
@@ -2143,7 +2134,6 @@
     finalLine.appendChild(blink)
     body.appendChild(finalLine)
 
-    /* Block sleep timer while hidden so we don't skip sequences offscreen */
     let waitTime = 0;
     while(waitTime < 3200) {
       if (terminalInView) waitTime += 100;
@@ -2189,7 +2179,6 @@
   const closeBtn = document.getElementById('modalClose')
   const form     = document.getElementById('modalForm')
   const modalContent = document.getElementById('modalContent')
-  const submitBtn = document.getElementById('modalSubmitBtn')
 
   const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
@@ -2226,19 +2215,24 @@
     }
   })
 
-  form.addEventListener('submit', async e => {
-    e.preventDefault()
+  /* FIXED: Extracted to a named async function to eliminate arguments.callee pointer faults. */
+  async function handleFormSubmit(e) {
+    e.preventDefault();
     
-    if (submitBtn.disabled) return;
+    // Live DOM queries prevent detached node references after an innerHTML structural reset.
+    const currentForm = document.getElementById('modalForm');
+    const currentSubmitBtn = document.getElementById('modalSubmitBtn');
     
-    if (!form.checkValidity()) {
-      form.reportValidity();
+    if (currentSubmitBtn.disabled) return;
+    
+    if (!currentForm.checkValidity()) {
+      currentForm.reportValidity();
       return;
     }
 
-    const originalText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending...';
+    const originalText = currentSubmitBtn.textContent;
+    currentSubmitBtn.disabled = true;
+    currentSubmitBtn.textContent = 'Sending...';
     
     const originalMarkup = modalContent.innerHTML;
 
@@ -2257,21 +2251,23 @@
         closeModal();
         setTimeout(() => { 
           modalContent.innerHTML = originalMarkup; 
-          document.getElementById('modalForm').addEventListener('submit', arguments.callee);
+          document.getElementById('modalForm').addEventListener('submit', handleFormSubmit);
         }, 300);
       }, 3000);
 
     } catch (error) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-      submitBtn.style.backgroundColor = "var(--red)";
-      submitBtn.textContent = 'Error. Try again?';
+      currentSubmitBtn.disabled = false;
+      currentSubmitBtn.textContent = originalText;
+      currentSubmitBtn.style.backgroundColor = "var(--red)";
+      currentSubmitBtn.textContent = 'Error. Try again?';
       setTimeout(() => {
-        submitBtn.style.backgroundColor = "";
-        submitBtn.textContent = originalText;
+        currentSubmitBtn.style.backgroundColor = "";
+        currentSubmitBtn.textContent = originalText;
       }, 3000);
     }
-  })
+  }
+
+  form.addEventListener('submit', handleFormSubmit);
 
   /* ─── Fade-up scroll observer ─── */
   const observer = new IntersectionObserver((entries) => {
