@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   
   <!-- SEO & Social Graph Metadata -->
   <title>Forma — Ship audit-grade software, faster.</title>
@@ -158,7 +158,8 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 900;
-      height: 60px;
+      height: calc(60px + env(safe-area-inset-top, 0px));
+      padding-top: env(safe-area-inset-top, 0px);
       display: flex;
       align-items: center;
       background: rgba(13, 15, 18, 0.88);
@@ -244,6 +245,7 @@
     .nav-cta { display: none; }
 
     .theme-toggle {
+      position: relative;
       width: 36px; height: 36px;
       border-radius: var(--radius);
       background: var(--surface);
@@ -266,6 +268,7 @@
     [data-theme="light"] .icon-sun  { display: block; }
 
     .hamburger {
+      position: relative;
       display: flex;
       flex-direction: column;
       gap: 5px;
@@ -296,13 +299,28 @@
     .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
+    /* FIXED: Apple HIG Touch Target Bounds Expansion (44x44 minimum) */
+    .theme-toggle::after,
+    .hamburger::after,
+    .modal-close::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+
     .mobile-overlay {
       display: flex;
       position: fixed;
-      inset: 60px 0 0 0;
+      inset: calc(60px + env(safe-area-inset-top, 0px)) 0 0 0;
       background: var(--bg);
       z-index: 850;
       padding: clamp(24px, 6vw, 40px) var(--container-x);
+      padding-bottom: calc(clamp(24px, 6vw, 40px) + env(safe-area-inset-bottom, 0px));
       flex-direction: column;
       gap: 4px;
       overflow-y: auto;
@@ -426,7 +444,7 @@
       min-height: 100svh;
       display: flex;
       align-items: center;
-      padding-top: 60px;
+      padding-top: calc(60px + env(safe-area-inset-top, 0px));
       overflow: hidden;
       position: relative;
     }
@@ -735,12 +753,17 @@
       line-height: 1.8;
       overflow-x: auto;
       scrollbar-width: thin;
-      scrollbar-color: var(--border-2 transparent);
+      scrollbar-color: var(--border-2) transparent;
+    }
+    .code-body::-webkit-scrollbar { height: 3px; }
+    .code-body::-webkit-scrollbar-track { background: transparent; }
+    .code-body::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+    @media (hover: hover) and (pointer: fine) {
+      .code-body::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
     }
     .code-body pre {
       margin: 0;
-      white-space: pre-wrap;
-      word-break: break-word;
+      white-space: pre;
     }
 
     .kw  { color: #7c6ff7; }
@@ -826,6 +849,41 @@
     }
 
     /* ══════════════════════════════════════════════════════════
+       SCROLL AFFORDANCES (Edge Masking)
+    ══════════════════════════════════════════════════════════ */
+    .scroll-mask-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+    }
+    .scroll-mask-wrap::after {
+      content: '';
+      position: absolute;
+      top: 1px; right: 1px; bottom: 1px;
+      width: 64px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 5;
+      border-radius: 0 calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0;
+    }
+    .scroll-mask-wrap.can-scroll-right::after {
+      opacity: 1;
+    }
+    .scroll-mask-wrap.who-mask::after { background: linear-gradient(to left, var(--bg), transparent); }
+    .scroll-mask-wrap.tab-mask::after { background: linear-gradient(to left, var(--surface), transparent); }
+
+    /* Preserve tab-list centering and spacing on desktop */
+    .scroll-mask-wrap.tab-list-wrap { margin: 0 0 40px; }
+    .scroll-mask-wrap.tab-list-wrap .tab-list { margin: 0; }
+    @media (min-width: 640px) {
+      .scroll-mask-wrap.tab-list-wrap {
+        width: fit-content;
+        margin: 0 auto 48px;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════════════
        FEATURE PROOF
     ══════════════════════════════════════════════════════════ */
     #features {
@@ -852,7 +910,6 @@
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
       max-width: 100%;
-      margin: 0 0 40px;
       scroll-snap-type: x mandatory;
       scroll-padding-left: 4px;
     }
@@ -860,8 +917,6 @@
 
     @media (min-width: 640px) {
       .tab-list {
-        width: fit-content;
-        margin: 0 auto 48px;
         scroll-snap-type: none;
       }
     }
@@ -922,6 +977,7 @@
       display: flex;
       flex-direction: column;
       gap: 11px;
+      margin-bottom: 24px;
     }
     .feature-item {
       display: flex;
@@ -1121,14 +1177,14 @@
       margin-bottom: 44px;
     }
     @media (max-width: 480px) {
-      .cta-actions { flex-direction: column; align-items: stretch; }
-      .cta-actions .btn { width: 100%; }
+      .terminal-body { font-size: 0.72rem; padding: 16px; min-height: 220px; }
+      .t-out { padding-left: 12px !important; }
     }
 
-    .objections {
-      display: flex;
-      gap: 24px;
-      justify-content: center;
+    .t-line { display: flex; gap: 8px; align-items: flex-start; }
+    .t-prompt { color: var(--accent); user-select: none; flex-shrink: 0; margin-top: 0.22em; }
+    .t-cmd    { color: var(--text); word-break: break-word; }
+    .t-out    { color: var(--text-muted); padding-left: 18px; }
       flex-wrap: wrap;
     }
     .objection {
@@ -1244,7 +1300,7 @@
     ══════════════════════════════════════════════════════════ */
     .cookie-banner {
       position: fixed;
-      bottom: 20px;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
       left: 20px;
       right: 20px;
       max-width: 400px;
@@ -1284,7 +1340,7 @@
     ══════════════════════════════════════════════════════════ */
     footer {
       border-top: 1px solid var(--border);
-      padding: 24px 0;
+      padding: 24px 0 calc(24px + env(safe-area-inset-bottom, 0px)) 0;
     }
     .footer-inner {
       max-width: 1200px;
@@ -1516,11 +1572,11 @@
       <p>Not a JIRA plugin. Not a compliance theater SaaS. Forma is for practitioners who own their client relationships end-to-end.</p>
     </div>
 
-    <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden;">
-      <table class="audience-table" role="table">
-        <thead>
-          <tr>
-            <th scope="col" style="width:35%">Audience</th>
+    <div class="scroll-mask-wrap who-mask">
+      <div class="table-wrap">
+        <table class="audience-table" role="table">
+          <thead>
+            <tr>
             <th scope="col">What Forma does for you</th>
           </tr>
         </thead>
@@ -1555,6 +1611,7 @@
           </tr>
         </tbody>
       </table>
+      </div>
     </div>
   </div>
 </section>
@@ -1568,11 +1625,13 @@
       <p>Each feature ships with a test harness, an escape hatch, and documentation your clients can actually read.</p>
     </div>
 
-    <div role="tablist" aria-label="Feature categories" class="tab-list">
-      <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="panel-audit"  id="tab-audit">Audit Engine</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-report"  id="tab-report">Reporting</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-ci"      id="tab-ci">CI/CD Integration</button>
-      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-api"     id="tab-api">API & Webhooks</button>
+    <div class="scroll-mask-wrap tab-mask tab-list-wrap">
+      <div role="tablist" aria-label="Feature categories" class="tab-list">
+        <button class="tab-btn" role="tab" aria-selected="true"  aria-controls="panel-audit"  id="tab-audit">Audit Engine</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-report"  id="tab-report">Reporting</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-ci"      id="tab-ci">CI/CD Integration</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-api"     id="tab-api">API & Webhooks</button>
+      </div>
     </div>
 
     <div class="tab-panels">
@@ -2171,6 +2230,33 @@
       })
     })
   })
+
+  /* ─── Horizontal Scroll Affordances ─── */
+  const scrollMaskWraps = document.querySelectorAll('.scroll-mask-wrap');
+  
+  function checkScrollEdges(wrap) {
+    const scrollEl = wrap.querySelector('.table-wrap, .tab-list');
+    if (!scrollEl) return;
+    
+    // Calculate distance remaining to scroll
+    const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+    
+    // Sub-pixel rendering buffer applied
+    if (maxScroll > 8 && scrollEl.scrollLeft < maxScroll - 2) {
+      wrap.classList.add('can-scroll-right');
+    } else {
+      wrap.classList.remove('can-scroll-right');
+    }
+  }
+
+  scrollMaskWraps.forEach(wrap => {
+    const scrollEl = wrap.querySelector('.table-wrap, .tab-list');
+    if (scrollEl) {
+      checkScrollEdges(wrap);
+      scrollEl.addEventListener('scroll', () => checkScrollEdges(wrap), { passive: true });
+      window.addEventListener('resize', () => checkScrollEdges(wrap), { passive: true });
+    }
+  });
 
   /* ─── Modal & Form Logic (Production Resiliency) ─── */
   const backdrop = document.getElementById('modalBackdrop')
