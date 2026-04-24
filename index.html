@@ -438,6 +438,22 @@
     }
 
     /* ══════════════════════════════════════════════════════════
+       MPA ROUTING INTERCEPT STATES
+    ══════════════════════════════════════════════════════════ */
+    .route-offline {
+      color: var(--red) !important;
+      pointer-events: none !important;
+    }
+    .btn-accent.route-offline {
+      background: transparent !important;
+      border-color: var(--red) !important;
+    }
+    .nav-links a.route-offline::after {
+      background: var(--red) !important;
+      width: 100% !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════
        HERO
     ══════════════════════════════════════════════════════════ */
     #hero {
@@ -622,8 +638,8 @@
       .t-out { padding-left: 12px !important; }
     }
 
-    .t-line { display: flex; gap: 8px; align-items: baseline; }
-    .t-prompt { color: var(--accent); user-select: none; flex-shrink: 0; }
+    .t-line { display: flex; gap: 8px; align-items: flex-start; }
+    .t-prompt { color: var(--accent); user-select: none; flex-shrink: 0; margin-top: 0.22em; }
     .t-cmd    { color: var(--text); word-break: break-word; }
     .t-out    { color: var(--text-muted); padding-left: 18px; }
     .t-out.success { color: #22c55e; }
@@ -1177,14 +1193,14 @@
       margin-bottom: 44px;
     }
     @media (max-width: 480px) {
-      .terminal-body { font-size: 0.72rem; padding: 16px; min-height: 220px; }
-      .t-out { padding-left: 12px !important; }
+      .cta-actions { flex-direction: column; align-items: stretch; }
+      .cta-actions .btn { width: 100%; }
     }
 
-    .t-line { display: flex; gap: 8px; align-items: flex-start; }
-    .t-prompt { color: var(--accent); user-select: none; flex-shrink: 0; margin-top: 0.22em; }
-    .t-cmd    { color: var(--text); word-break: break-word; }
-    .t-out    { color: var(--text-muted); padding-left: 18px; }
+    .objections {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
       flex-wrap: wrap;
     }
     .objection {
@@ -1577,40 +1593,41 @@
         <table class="audience-table" role="table">
           <thead>
             <tr>
-            <th scope="col">What Forma does for you</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="fade-up">
-            <td>
-              <div class="td-tag">Freelance devs</div>
-              <div class="td-who">Solo engineers & contractors</div>
-            </td>
-            <td class="td-value">Gives you audit artifacts your clients can hold—so disputes about scope become non-conversations. Close the engagement, move on.</td>
-          </tr>
-          <tr class="fade-up">
-            <td>
-              <div class="td-tag">Agencies</div>
-              <div class="td-who">Digital product studios</div>
-            </td>
-            <td class="td-value">Standardize quality across all client projects without doubling QA headcount. One config file, consistent output on every delivery.</td>
-          </tr>
-          <tr class="fade-up">
-            <td>
-              <div class="td-tag">Founders</div>
-              <div class="td-who">Technical startup founders</div>
-            </td>
-            <td class="td-value">Ship investor updates and due-diligence packages that include verifiable code quality signals—not just a Loom and a roadmap slide.</td>
-          </tr>
-          <tr class="fade-up">
-            <td>
-              <div class="td-tag">Auditors</div>
-              <div class="td-who">Security & compliance consultants</div>
-            </td>
-            <td class="td-value">Run reproducible assessments with full trace logs. Every finding links to a commit hash. No more "it depends on the environment" calls.</td>
-          </tr>
-        </tbody>
-      </table>
+              <th scope="col" style="width:35%">Audience</th>
+              <th scope="col">What Forma does for you</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="fade-up">
+              <td>
+                <div class="td-tag">Freelance devs</div>
+                <div class="td-who">Solo engineers & contractors</div>
+              </td>
+              <td class="td-value">Gives you audit artifacts your clients can hold—so disputes about scope become non-conversations. Close the engagement, move on.</td>
+            </tr>
+            <tr class="fade-up">
+              <td>
+                <div class="td-tag">Agencies</div>
+                <div class="td-who">Digital product studios</div>
+              </td>
+              <td class="td-value">Standardize quality across all client projects without doubling QA headcount. One config file, consistent output on every delivery.</td>
+            </tr>
+            <tr class="fade-up">
+              <td>
+                <div class="td-tag">Founders</div>
+                <div class="td-who">Technical startup founders</div>
+              </td>
+              <td class="td-value">Ship investor updates and due-diligence packages that include verifiable code quality signals—not just a Loom and a roadmap slide.</td>
+            </tr>
+            <tr class="fade-up">
+              <td>
+                <div class="td-tag">Auditors</div>
+                <div class="td-who">Security & compliance consultants</div>
+              </td>
+              <td class="td-value">Run reproducible assessments with full trace logs. Every finding links to a commit hash. No more "it depends on the environment" calls.</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -2079,7 +2096,14 @@
   }
 
   hamburger.addEventListener('click', () => mobileOverlay.classList.contains('open') ? closeMenu() : openMenu())
-  mobileLinks.forEach(l => l.addEventListener('click', closeMenu))
+  
+  /* FIXED: Allow offline intercept states to be visible in the mobile drawer */
+  mobileLinks.forEach(l => {
+    l.addEventListener('click', (e) => {
+      if (l.getAttribute('href').startsWith('/')) return;
+      closeMenu();
+    });
+  });
 
   /* ─── Cookie Consent Logic ─── */
   const cookieBanner = document.getElementById('cookieBanner');
@@ -2301,7 +2325,6 @@
     }
   })
 
-  /* FIXED: Extracted to a named async function to eliminate arguments.callee pointer faults. */
   async function handleFormSubmit(e) {
     e.preventDefault();
     
@@ -2354,6 +2377,34 @@
   }
 
   form.addEventListener('submit', handleFormSubmit);
+
+  /* ─── MPA Anchor Fracture Intercept (Auth/Route Shield) ─── */
+  const deadLinks = document.querySelectorAll('a[href^="/"]');
+  deadLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Prevent rapid-fire mutation bugs
+      if (this.dataset.routingBlocked === 'true') return;
+      this.dataset.routingBlocked = 'true';
+
+      // Cache exact inner markup (handles spans/icons if present)
+      const originalHTML = this.innerHTML;
+      const href = this.getAttribute('href');
+      const isAuth = href.includes('login') || href.includes('signup');
+      
+      // Morph state
+      this.classList.add('route-offline');
+      this.textContent = isAuth ? '[ Auth Offline ]' : '[ Route Blocked ]';
+
+      // Revert after 2.5s
+      setTimeout(() => {
+        this.innerHTML = originalHTML;
+        this.classList.remove('route-offline');
+        this.dataset.routingBlocked = 'false';
+      }, 2500);
+    });
+  });
 
   /* ─── Fade-up scroll observer ─── */
   const observer = new IntersectionObserver((entries) => {
